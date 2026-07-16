@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PIR — Packages Data (Excel upload · Price Level · Replicate) — Mockup v7</title>
+<style>
+  :root{
+    --bg:#0a0e18;
+    --bg-2:#0d1220;
+    --panel:#111828;
+    --panel-2:#0f1524;
+    --line:#1e2a40;
+    --line-2:#26344e;
+    --text:#e8edf6;
+    --text-2:#9aa7bd;
+    --text-3:#6b7893;
+    --blue:#2f6bff;
+    --blue-2:#3b82f6;
+    --blue-soft:#16233f;
+    --danger:#e7453a;
+    --danger-soft:#2a1417;
+    --ok:#2fbf71;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+
+  /* sidebar */
+  .side{width:64px;flex:0 0 64px;background:var(--bg-2);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0}
+  .side .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--blue),#7aa2ff);
+    display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:14px}
+  .side .ico{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    color:var(--text-3);cursor:pointer}
+  .side .ico:hover{background:#131c2e;color:var(--text-2)}
+  .side .ico.active{color:var(--blue-2)}
+
+  .main{flex:1;min-width:0}
+  .topbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+    justify-content:space-between;padding:0 28px;background:var(--bg-2)}
+  .topbar .title{font-size:13px;letter-spacing:.14em;font-weight:700;color:var(--text-2)}
+  .avatar{width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-2)}
+
+  .content{padding:24px 28px 56px}
+  .tabs{border-bottom:1px solid var(--line);margin:4px 0 22px;display:flex;gap:26px}
+  .tab{display:inline-block;padding:10px 2px;font-size:14px;color:var(--text-3);font-weight:600;
+    border-bottom:2px solid transparent;cursor:pointer}
+  .tab.on{color:var(--blue-2);border-bottom-color:var(--blue-2)}
+
+  .btn{border:1px solid var(--line-2);background:transparent;color:var(--text);
+    padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{border-color:#3a4a6a;background:#0f1727}
+  .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn-primary:hover{background:#2a5fe0}
+  .btn-sm{padding:7px 13px;font-size:12px}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+
+  .fw-head{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:18px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .fw-head .ttl{display:flex;align-items:baseline;gap:10px}
+  .fw-head h2{font-size:16px;margin:0}
+  .fw-head .count{font-size:13px;color:var(--text-3)}
+  .fw-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .search{display:flex;align-items:center;gap:8px;background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:8px;padding:7px 11px;min-width:220px}
+  .search input{background:transparent;border:0;outline:0;color:var(--text);font-size:13px;width:100%}
+  .search input::placeholder{color:var(--text-3)}
+
+  /* replicate bar (outside the table, select-all style) */
+  .repbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 22px;border-bottom:1px solid var(--line);background:var(--blue-soft);flex-wrap:wrap}
+  .repbar .txt{font-size:12.5px;color:var(--text-2)}
+  .repbar .txt b{color:var(--text)}
+
+  table{width:100%;border-collapse:collapse}
+  thead th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);
+    text-align:left;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  thead th.center{text-align:center}
+  thead tr.groups th{padding:9px 16px;border-bottom:1px solid var(--line-2);color:var(--blue-2);
+    background:#0e1626;font-size:10.5px}
+  thead tr.groups th.pkg{border-left:1px solid var(--line-2)}
+  thead tr.groups th.vsl{border-left:2px solid var(--line-2);color:#c9a24a}
+  th.vsep, td.vsep{border-left:2px solid var(--line-2)}
+  tbody td{padding:11px 16px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+  tbody tr:hover{background:#0f1829}
+  td.center{text-align:center}
+  .pkgname{font-weight:600;color:var(--text);white-space:nowrap}
+  .pkgprice{font-variant-numeric:tabular-nums}
+
+  .select,.note-input,.amt-input{background:var(--panel-2);border:1px solid var(--line-2);
+    color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px}
+  .select{min-width:96px}
+  .select.unit{min-width:110px}
+  .note-input{width:100%;min-width:150px;max-width:240px}
+  .note-input::placeholder,.amt-input::placeholder{color:var(--text-3)}
+  .amt-input{width:70px;text-align:center}
+  .select:disabled,.note-input:disabled{opacity:.4}
+
+  .yn{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+  .yn button{background:transparent;border:0;color:var(--text-3);padding:6px 13px;font-size:12px;
+    font-weight:600;cursor:pointer}
+  .yn button.on{background:var(--blue-soft);color:var(--blue-2);box-shadow:inset 0 0 0 1px var(--blue)}
+
+  /* validation */
+  .invalid .yn, .yn.invalid{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+  .select.invalid,.note-input.invalid,.amt-input.invalid{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+  .valmsg{display:none;margin:0;padding:12px 22px;border-bottom:1px solid var(--line);
+    background:var(--danger-soft);color:#f2a09a;font-size:12.5px}
+  .valmsg.show{display:block}
+
+  .fw-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;flex-wrap:wrap;gap:12px}
+  .showing{font-size:13px;color:var(--text-3)}
+  .foot-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .pager{display:flex;align-items:center;gap:6px}
+  .pager button{min-width:32px;height:32px;border:1px solid var(--line-2);background:transparent;
+    color:var(--text-2);border-radius:7px;font-size:13px;cursor:pointer}
+  .pager button.on{border-color:var(--blue);color:var(--blue-2);background:var(--blue-soft)}
+
+  .legend{display:flex;gap:18px;align-items:center;font-size:11.5px;color:var(--text-3);
+    padding:10px 22px;border-bottom:1px solid var(--line)}
+  .legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .toast{position:fixed;bottom:24px;right:24px;background:#10261a;border:1px solid var(--ok);
+    color:#9fe8c3;padding:12px 18px;border-radius:10px;font-size:13px;display:none}
+  .toast.show{display:block}
+
+  /* replicate button — aligned with app primary blue */
+  #replicate{background:#62a9de;border-color:#62a9de;color:#0a0e18;font-weight:700}
+  #replicate:hover{background:#79b7e4;border-color:#79b7e4}
+  #replicate svg{stroke:#0a0e18}
+
+  /* tooltip */
+  .tt{position:relative;display:inline-flex;align-items:center;cursor:help}
+  .tt-box{display:none;position:absolute;left:18px;bottom:-6px;z-index:10;width:420px;max-width:60vw;
+    background:#44546a;color:#eef2f8;font-size:14px;line-height:1.45;padding:14px 18px;border-radius:6px}
+  .tt:hover .tt-box{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo">▶</div>
+    <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="6" width="3" height="11"/><rect x="17" y="13" width="3" height="4"/></svg></div>
+    <div class="ico active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+    <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="title">PRODUCT INVOICING RULES</div>
+      <div class="avatar">PT</div>
+    </div>
+
+    <div class="content">
+      <a style="color:var(--blue-2);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:6px" href="#">← Back</a>
+      <h1 style="font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em">New Product</h1>
+      <div class="tabs">
+        <span class="tab">Billing rules</span>
+        <span class="tab on">Package Options</span>
+      </div>
+
+      <!-- upload block (OutSystems out-of-the-box upload widget) -->
+      <section class="panel" style="padding:20px 22px;margin-bottom:20px">
+        <div style="display:flex;align-items:flex-end;gap:16px">
+          <div style="flex:1;min-width:0">
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2);margin-bottom:8px">
+              Package Options File
+              <span class="tt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span class="tt-box">Please enter the package options file of the service that has been agreed with the pricing team</span>
+              </span>
+              <span style="color:var(--danger)">*</span>
+            </label>
+            <div style="display:flex;align-items:center;gap:14px;background:transparent;border:1px solid var(--line-2);border-radius:8px;padding:16px 18px;cursor:pointer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <span style="font-size:14px">Select file</span>
+            </div>
+          </div>
+          <button class="btn" style="padding:16px 18px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Package Options Template
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="fw-head">
+          <div class="ttl">
+            <h2>Packages Data</h2>
+          </div>
+          <div class="fw-tools">
+            <button class="btn btn-sm" id="replicate">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+              Apply first row to all
+            </button>
+          </div>
+        </div>
+
+        <div class="valmsg" id="valmsg"></div>
+
+        <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr class="groups">
+              <th colspan="2"></th>
+              <th class="pkg center" colspan="5">Package level</th>
+              <th class="vsl center" colspan="2">Vessel / Subscription level</th>
+            </tr>
+            <tr>
+              <th>Commercial Package</th>
+              <th>Price</th>
+              <th class="center" style="border-left:1px solid var(--line-2)">Price Level *</th>
+              <th class="center">Lease *</th>
+              <th class="center">Promotion *</th>
+              <th class="center">Regional *</th>
+              <th>Included Changes</th>
+              <th class="center vsep">Amount of Incl. Changes</th>
+              <th class="center">Unit</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        </div>
+
+      </section>
+
+      <!-- full product submit -->
+      <div style="display:flex;justify-content:flex-start;gap:12px;margin-top:24px">
+        <button class="btn">Cancel</button>
+        <button class="btn" id="save" style="background:#62a9de;border-color:#62a9de;color:#0a0e18;font-weight:700;padding:12px 22px">Submit product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Product submitted</div>
+
+<script>
+  // ------- demo data: fresh upload => no presets anywhere -------
+  const sizes=[10,25,50,100,150,250,500,1000];
+  const terms=["1M","12M","24M","36M"];
+  const data=[];
+  for(const t of terms){for(const s of sizes){
+    data.push({name:`FBB 2023 ${t} ${s} MB`,price:Math.round(s*1.4+terms.indexOf(t)*90+180),
+      pl:null,lease:null,promo:null,regional:null,note:"",amount:"",unit:""});
+  }}
+
+  const PL=["SD","VP","Public"], UNITS=["per month","per year","per day"];
+  const rowsEl=document.getElementById('rows'),valEl=document.getElementById('valmsg');
+
+  const yn=(v,f)=>`<span class="yn" data-f="${f}">
+      <button class="${v===true?'on':''}" data-v="1">Yes</button>
+      <button class="${v===false?'on':''}" data-v="0">No</button></span>`;
+  const sel=(opts,v,f,cls,ph)=>`<select class="select ${cls||''}" data-f="${f}" ${f==='unit'&&(parseInt(v0(v))===0)?'':''}>
+      <option value="">${ph||'-'}</option>${opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+  const v0=x=>x===''?'':x;
+
+  function render(){
+    const list=data;
+
+    rowsEl.innerHTML=list.map(d=>{
+      const i=data.indexOf(d);
+      return `<tr data-i="${i}">
+        <td class="pkgname">${d.name}</td>
+        <td class="pkgprice">${d.price.toLocaleString()}</td>
+        <td class="center" style="border-left:1px solid var(--line-2)">${sel(PL,d.pl,'pl')}</td>
+        <td class="center">${yn(d.lease,'lease')}</td>
+        <td class="center">${yn(d.promo,'promo')}</td>
+        <td class="center">${yn(d.regional,'regional')}</td>
+        <td><input class="note-input" data-f="note" value="${d.note}" placeholder="Describe included changes…"/></td>
+        <td class="center vsep"><input class="amt-input" data-f="amount" value="${d.amount}" placeholder="0" inputmode="numeric"/></td>
+        <td class="center"><select class="select unit" data-f="unit">
+          <option value="">-</option>${UNITS.map(u=>`<option ${u===d.unit?'selected':''}>${u}</option>`).join('')}</select></td>
+      </tr>`;}).join('');
+  }
+
+  rowsEl.addEventListener('click',e=>{
+    const btn=e.target.closest('.yn button');if(!btn)return;
+    const tr=btn.closest('tr'),d=data[tr.dataset.i],f=btn.parentElement.dataset.f;
+    d[f]=btn.dataset.v==='1';render();
+  });
+  rowsEl.addEventListener('change',e=>{
+    const el=e.target,tr=el.closest('tr');if(!tr)return;
+    const d=data[tr.dataset.i],f=el.dataset.f;if(!f)return;
+    d[f]=el.value;
+  });
+  rowsEl.addEventListener('input',e=>{
+    const el=e.target;if(el.dataset.f==='note')data[el.closest('tr').dataset.i].note=el.value;
+  });
+
+  // ------- replicate first row (vertical, one-off) -------
+  document.getElementById('replicate').addEventListener('click',()=>{
+    const first=data[0];
+    const missing=[];
+    if(first.pl==null||first.pl==='')missing.push('Price Level');
+    if(first.lease==null)missing.push('Lease');
+    if(first.promo==null)missing.push('Promotion');
+    if(first.regional==null)missing.push('Regional');
+    if(missing.length){showVal(`Define ${missing.join(', ')} on the first row before replicating.`);return;}
+    hideVal();
+    for(const d of data){d.pl=first.pl;d.lease=first.lease;d.promo=first.promo;d.regional=first.regional;}
+    render();
+  });
+
+  // ------- save with validations -------
+  document.getElementById('save').addEventListener('click',()=>{
+    const errs=[];
+    data.forEach((d,i)=>{
+      const row=`Row ${i+1} (${d.name})`;
+      if(d.pl==null||d.pl==='')errs.push(`${row}: Price Level is mandatory.`);
+      if(d.lease==null)errs.push(`${row}: Lease must be Yes or No.`);
+      if(d.promo==null)errs.push(`${row}: Promotion must be Yes or No.`);
+      if(d.regional==null)errs.push(`${row}: Regional must be Yes or No.`);
+      if(d.note){
+        if(d.amount==='')errs.push(`${row}: Amount of Included Changes is mandatory when Included Changes has content.`);
+        else if(!d.unit)errs.push(`${row}: Unit is mandatory when Included Changes and Amount have content.`);
+      }
+    });
+    if(errs.length){showVal(errs.slice(0,5).join('<br>')+(errs.length>5?`<br>… and ${errs.length-5} more.`:''));markInvalid();return;}
+    hideVal();
+    const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);
+  });
+
+  function markInvalid(){
+    rowsEl.querySelectorAll('tr').forEach(tr=>{
+      const d=data[tr.dataset.i];
+      tr.querySelectorAll('.yn').forEach(g=>{
+        const f=g.dataset.f;g.classList.toggle('invalid',d[f]==null);});
+      const pl=tr.querySelector('[data-f="pl"]');pl.classList.toggle('invalid',!d.pl);
+      const hasNote=!!d.note;
+      tr.querySelector('[data-f="amount"]').classList.toggle('invalid',hasNote&&d.amount==='');
+      tr.querySelector('[data-f="unit"]').classList.toggle('invalid',hasNote&&d.amount!==''&&!d.unit);
+    });
+  }
+  function showVal(html){valEl.innerHTML=html;valEl.classList.add('show');}
+  function hideVal(){valEl.classList.remove('show');rowsEl.querySelectorAll('.invalid').forEach(x=>x.classList.remove('invalid'));}
+
+  render();
+</script>
+</body>
+</html>
