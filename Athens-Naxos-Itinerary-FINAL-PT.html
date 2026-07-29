@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0e3a63">
+<title>Atenas &amp; Náxos · 31 jul – 7 ago 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --ink:#12233d; --sea:#1c5d99; --sea-dark:#0e3a63; --aegean:#2274b5; --sand:#f7f1e5; --card:#ffffff;
+    --gold:#c99a2e; --terra:#c96b3f; --ok:#2e8b57; --muted:#67728a; --white:#fdfdfb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--sand);color:var(--ink);line-height:1.55}
+  .wrap{max-width:880px;margin:0 auto;padding:0 18px}
+  h1,h2,.serif{font-family:'GFS Didot','Playfair Display',serif}
+
+  /* MEANDRO GREGO */
+  .meander{height:24px;margin:34px 0 10px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21 V3 H21 V21 H9 V9 H15 V15' fill='none' stroke='%23c99a2e' stroke-width='2.2'/%3E%3C/svg%3E") repeat-x center}
+  .meander.blue{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21 V3 H21 V21 H9 V9 H15 V15' fill='none' stroke='%23ffffff' stroke-width='2.2' opacity='0.55'/%3E%3C/svg%3E")}
+
+  /* HERO */
+  .hero{position:relative;min-height:520px;display:flex;align-items:flex-end;color:#fff;
+    background:linear-gradient(180deg,rgba(9,22,44,.30),rgba(9,22,44,.86)),
+    url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/1029_Acrópole_of_Atenas_in_Grécia_at_night_Photo_by_Giles_Laurent.jpg/1400px-1029_Acrópole_of_Atenas_in_Grécia_at_night_Photo_by_Giles_Laurent.jpg') center/cover}
+  .hero-inner{width:100%;max-width:880px;margin:0 auto;padding:60px 18px 30px}
+  .hero .kicker{letter-spacing:.3em;text-transform:uppercase;font-size:12px;font-weight:700;color:#f0d38e}
+  .hero h1{font-size:clamp(44px,8vw,78px);font-weight:400;line-height:1.02;margin:10px 0 6px}
+  .hero .tag{font-family:'GFS Didot',serif;font-size:clamp(17px,3vw,22px);color:#e8eef7;font-style:italic}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{background:rgba(255,255,255,.13);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;padding:6px 14px;font-size:13px;font-weight:500}
+
+  /* COUNTDOWN */
+  .count{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .cbox{background:rgba(255,255,255,.10);border:1px solid rgba(240,211,142,.5);border-radius:12px;
+    padding:10px 16px;text-align:center;min-width:74px}
+  .cbox b{display:block;font-size:26px;font-family:'GFS Didot',serif;color:#f0d38e}
+  .cbox span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+
+  /* STATS STRIP */
+  .stats{background:var(--sea-dark);color:#fff;padding:20px 0}
+  .stats .row{display:flex;flex-wrap:wrap;justify-content:space-around;gap:14px;max-width:880px;margin:0 auto;padding:0 18px;text-align:center}
+  .stat b{display:block;font-family:'GFS Didot',serif;font-size:30px;color:#f0d38e}
+  .stat span{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:#a9c6e2}
+
+  /* SECÇÕES */
+  section{padding:34px 0 8px}
+  h2{font-size:32px;margin-bottom:4px;font-weight:400}
+  .lede{color:var(--muted);margin-bottom:20px;font-size:15px}
+  .daytag{display:inline-block;background:var(--sea);color:#fff;border-radius:8px;padding:3px 12px;
+    font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .daytag.naxos{background:var(--terra)}
+
+  /* PORQUÊ */
+  .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0}
+  .wcard{background:var(--card);border-top:4px solid var(--gold);border-radius:0 0 14px 14px;
+    padding:18px;box-shadow:0 2px 12px rgba(18,35,61,.08)}
+  .wcard .ico{font-size:26px}
+  .wcard h3{font-family:'GFS Didot',serif;font-size:19px;margin:8px 0 4px}
+  .wcard p{font-size:13.5px;color:#3d4a66}
+
+  /* ORÇAMENTO */
+  .budget{background:var(--sea-dark);color:#fff;border-radius:18px;padding:26px 24px;margin:26px 0 8px;position:relative;overflow:hidden}
+  .budget h2{color:#f0d38e}
+  .budget table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14.5px}
+  .budget th{text-align:left;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#9fc2df;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.2)}
+  .budget td{padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.12);vertical-align:top}
+  .budget td.amt{text-align:right;font-weight:600;white-space:nowrap}
+  .budget tr.total td{border-bottom:none;padding-top:14px;font-size:17px;font-weight:700;color:#f0d38e}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:.04em}
+  .pill.paid{background:#215c3f;color:#9be3bb}
+  .pill.ind{background:#5c4a21;color:#f0d38e}
+  .fineprint{font-size:12.5px;color:#9fc2df;margin-top:12px}
+
+  /* BANDA DE PREÇO + NOTA PRÁTICA */
+  .pr{display:inline-block;background:#efe3c4;color:#6b5312;border-radius:6px;padding:1px 7px;
+    font-size:11.5px;font-weight:700;letter-spacing:.06em;vertical-align:1px;white-space:nowrap}
+  .naxos-zone .pr{background:#d3ebf0;color:#0b5b74}
+  .note{display:block;margin-top:7px;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .naxos-zone .note{color:#417080}
+  .eat .etxt>b:first-child{color:var(--sea-dark)}
+  .prkey{background:#fff;border:1px solid #ecdfc2;border-radius:12px;padding:14px 18px;margin:16px 0;font-size:13.5px}
+  .prkey b{color:var(--sea-dark)}
+  .prkey .row2{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px}
+  .prkey .row2 span{white-space:nowrap}
+
+  /* TRANSPORTES */
+  .transit{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+  .tcard{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:0 2px 10px rgba(18,35,61,.08)}
+  .tcard .tk{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .tcard .tt{font-weight:700;font-size:16px;margin:4px 0 2px}
+  .tcard .td{font-size:13.5px;color:var(--muted)}
+
+  /* CARTÕES DE LOCAL */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0 26px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .spot{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(18,35,61,.09)}
+  .spot.wide{grid-column:1/-1}
+  .spot img{width:100%;height:190px;object-fit:cover;display:block}
+  .spot.wide img{height:270px}
+  .spot .pad{padding:14px 16px 16px}
+  .spot .time{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .spot h3{font-family:'GFS Didot',serif;font-size:20px;margin:3px 0 5px}
+  .spot p{font-size:13.8px;color:#3d4a66}
+  .noimg{height:12px;background:linear-gradient(90deg,var(--sea),var(--terra))}
+  .greek{font-family:'GFS Didot',serif;color:var(--aegean);font-size:13px;font-style:italic}
+
+  /* COMER */
+  .eat{background:#fdf7ea;border:1px solid #ecdfc2;border-radius:14px;padding:14px 18px;margin:0 0 14px;font-size:14px;display:flex;align-items:center;gap:14px}
+  .eat .etxt{flex:1}
+  .eatthumb{width:96px;height:96px;border-radius:12px;object-fit:cover;flex:none;box-shadow:0 2px 8px rgba(18,35,61,.18)}
+  @media(max-width:480px){.eatthumb{width:72px;height:72px}}
+  .eatthumbs{display:flex;gap:6px;flex:none}
+  .eatthumbs .eatthumb{width:76px;height:96px}
+  @media(max-width:480px){.eatthumbs .eatthumb{width:56px;height:72px}}
+  .eat b{color:var(--sea-dark)}
+  .eat .em{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--terra)}
+
+  .tip{border-left:4px solid var(--gold);background:#fff;border-radius:0 12px 12px 0;
+    padding:12px 16px;margin:0 0 14px;font-size:13.8px;color:#3d4a66}
+
+  /* NAXOS HERO */
+  .nhero{position:relative;min-height:380px;display:flex;align-items:flex-end;color:#fff;border-radius:20px;overflow:hidden;margin:30px 0 10px;
+    background:linear-gradient(180deg,rgba(9,22,44,.15),rgba(9,22,44,.82)),
+    url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Náxos_%CE%9D%CE%AC%CE%BE%CE%BF%CF%82_2020-08-20_02_Chora_Grotta_and_Vintzi_beaches.jpg/1400px-Náxos_%CE%9D%CE%AC%CE%BE%CE%BF%CF%82_2020-08-20_02_Chora_Grotta_and_Vintzi_beaches.jpg') center/cover}
+  .nhero .hero-inner{padding:46px 22px 26px}
+
+  /* CHECKLIST */
+  .check{background:var(--card);border-radius:16px;padding:22px 24px;box-shadow:0 2px 12px rgba(18,35,61,.09);margin:16px 0}
+  .check ul{list-style:none;margin-top:10px}
+  .check li{padding:8px 0 8px 34px;position:relative;font-size:14.5px;border-bottom:1px dashed #e8ddc6}
+  .check li:last-child{border-bottom:none}
+  .check li::before{content:'☐';position:absolute;left:4px;color:var(--gold);font-size:18px}
+
+  /* === PARTE I · ATENAS — mármore clássico, dourado, pedra === */
+  .athens-zone{background:linear-gradient(180deg,#f7f1e5 0%,#eee4cd 100%);padding-bottom:26px}
+  .athens-zone .spot{border-radius:6px;border-top:3px solid var(--gold)}
+  .athens-zone .spot img{filter:saturate(.92) contrast(1.05) sepia(.08)}
+  .athens-zone .daytag{background:var(--sea-dark);box-shadow:inset 0 0 0 1px var(--gold)}
+  .athens-zone h2{color:#2e2609}
+  .athens-zone .spot .time{color:#8a6a1c}
+  .athens-zone .tcard{border-radius:6px;border-top:3px solid var(--gold)}
+
+  /* === PARTE II · NÁXOS — branco das Cíclades, turquesa, brisa === */
+  .naxos-zone{background:linear-gradient(180deg,#eef8fa 0%,#d8eff4 100%);padding-bottom:26px}
+  .naxos-zone .spot{border-radius:22px}
+  .naxos-zone .spot img{filter:saturate(1.14) brightness(1.02)}
+  .naxos-zone h2{color:#0b5b74}
+  .naxos-zone .daytag,.naxos-zone .daytag.naxos{background:#0e8ba6}
+  .naxos-zone .spot .time{color:#0e8ba6}
+  .naxos-zone .meander{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21 V3 H21 V21 H9 V9 H15 V15' fill='none' stroke='%230e8ba6' stroke-width='2.2'/%3E%3C/svg%3E")}
+  .naxos-zone .eat{background:#f0fbfa;border-color:#c3e7e4}
+  .naxos-zone .eat .em{color:#0e8ba6}
+  .naxos-zone .tip{border-left-color:#0e8ba6}
+  .naxos-zone .tcard{border-radius:22px}
+  .naxos-zone .tcard .tk{color:#0e8ba6}
+  .naxos-zone .noimg{background:linear-gradient(90deg,#0e8ba6,#8fd6e3)}
+  .naxos-zone .check li::before{color:#0e8ba6}
+  .naxos-zone .lede{color:#417080}
+
+  /* faixa de parte */
+  .partband{display:flex;align-items:center;gap:16px;margin:30px 0 4px;font-family:'GFS Didot',serif}
+  .partband span{font-size:13px;letter-spacing:.32em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+  .partband::before,.partband::after{content:'';flex:1;height:2px;background:currentColor;opacity:.28}
+  .partband.athens{color:#8a6a1c}
+  .partband.naxos{color:#0e7d96}
+
+
+  /* NAV CHIPS */
+  .navchips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 4px;justify-content:center}
+  .navchips a{text-decoration:none;background:#fff;border:1.5px solid var(--gold);color:#6b5312;
+    border-radius:999px;padding:7px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 6px rgba(18,35,61,.08)}
+  .navchips a.nx{border-color:#0e8ba6;color:#0b5b74}
+
+  /* PLACEHOLDERS ILUSTRADOS */
+  .ph{height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='16' viewBox='0 0 24 13'%3E%3Cpath d='M2 11 V2 H11 V11 H6 V6 H8' fill='none' stroke='%23f0d38e' stroke-width='1.6' opacity='.7'/%3E%3C/svg%3E") repeat-x top 10px center,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='16' viewBox='0 0 24 13'%3E%3Cpath d='M2 11 V2 H11 V11 H6 V6 H8' fill='none' stroke='%23f0d38e' stroke-width='1.6' opacity='.7'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom 10px center,
+      linear-gradient(160deg,#123a63,#1c5d99)}
+  .ph.tall{height:270px}
+  .ph-ico{font-size:42px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+  .ph-t{font-family:'GFS Didot',serif;font-size:18px;color:#fff;text-align:center;padding:0 14px}
+  .naxos-zone .ph{background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='14' viewBox='0 0 46 14'%3E%3Cpath d='M0 8 Q11.5 0 23 8 T46 8' fill='none' stroke='%23ffffff' stroke-width='2' opacity='.55'/%3E%3C/svg%3E") repeat-x top 12px center,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='14' viewBox='0 0 46 14'%3E%3Cpath d='M0 8 Q11.5 0 23 8 T46 8' fill='none' stroke='%23ffffff' stroke-width='2' opacity='.55'/%3E%3C/svg%3E") repeat-x bottom 12px center,
+      linear-gradient(160deg,#0e8ba6,#66c6da)}
+
+  /* SILHUETAS DECORATIVAS NOS HEROES */
+  .hero,.nhero{isolation:isolate}
+  .hero::after{content:'';position:absolute;inset:auto 0 0 0;height:110px;z-index:-0;pointer-events:none;opacity:.22;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='110' viewBox='0 0 260 110'%3E%3Cg fill='%23f0d38e'%3E%3Cpath d='M10 38 L130 8 L250 38 L250 46 L10 46 Z'/%3E%3Crect x='22' y='52' width='18' height='50'/%3E%3Crect x='70' y='52' width='18' height='50'/%3E%3Crect x='118' y='52' width='18' height='50'/%3E%3Crect x='166' y='52' width='18' height='50'/%3E%3Crect x='214' y='52' width='18' height='50'/%3E%3Crect x='14' y='102' width='232' height='8'/%3E%3C/g%3E%3C/svg%3E") repeat-x bottom center/260px 110px}
+  .nhero::after{content:'';position:absolute;inset:auto 0 0 0;height:60px;pointer-events:none;opacity:.3;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60' viewBox='0 0 120 60'%3E%3Cpath d='M0 40 Q30 20 60 40 T120 40' fill='none' stroke='%23ffffff' stroke-width='3'/%3E%3Cpath d='M0 52 Q30 32 60 52 T120 52' fill='none' stroke='%23ffffff' stroke-width='2' opacity='.6'/%3E%3C/svg%3E") repeat-x bottom center/120px 60px}
+  .hero-inner{position:relative;z-index:1}
+
+  .chiprow{display:flex;gap:10px;margin:2px 0 22px;flex-wrap:wrap}
+  .chipitem{display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:4px 14px 4px 4px;
+    box-shadow:0 2px 8px rgba(18,35,61,.09);font-size:12.5px;font-weight:600;color:#3d4a66}
+  .chipitem img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none}
+  .naxos-zone .chipitem{color:#0b5b74}
+
+  /* PANORAMA · TIMELINE */
+  .panorama{background:rgba(255,255,255,.55);border-radius:18px;padding:20px 22px 6px;margin:14px 0 30px}
+  .panorama>h3{font-family:'GFS Didot',serif;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:#8a6a1c;margin-bottom:14px}
+  .naxos-zone .panorama>h3{color:#0b5b74}
+  .tl{position:relative;padding-left:24px}
+  .tl::before{content:'';position:absolute;left:8px;top:4px;bottom:16px;width:2px;background:var(--gold)}
+  .naxos-zone .tl::before{background:#0e8ba6}
+  .tlday{position:relative;padding-bottom:20px}
+  .tlday::before{content:'';position:absolute;left:-24px;top:2px;width:12px;height:12px;border-radius:50%;
+    background:var(--gold);border:3px solid #f2e9d3}
+  .naxos-zone .tlday::before{background:#0e8ba6;border-color:#e3f2f5}
+  .tlhead{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .tlhead .tld{font-family:'GFS Didot',serif;font-size:15px;font-weight:700;color:#6b5312}
+  .naxos-zone .tlhead .tld{color:#0b5b74}
+  .tlhead .tll{font-size:12px;color:var(--muted)}
+  .tlstops{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+  .tlstop{background:#fff;border:1px solid #ecdfc2;border-radius:999px;padding:3px 12px;font-size:12.5px;color:#3d4a66;white-space:nowrap}
+  .naxos-zone .tlstop{border-color:#c3e7e4}
+  .tlarrow{color:#c9a35c;font-size:12px}
+  .naxos-zone .tlarrow{color:#7fc3d1}
+
+  footer{background:var(--sea-dark);color:#a9c6e2;margin-top:40px;padding:30px 0 40px;text-align:center;font-size:13px}
+  footer .big{font-family:'GFS Didot',serif;font-size:26px;color:#f0d38e;margin-bottom:6px}
+
+  /* MAPAS DO DIA */
+  .daymap{height:260px;border-radius:16px;overflow:hidden;margin:10px 0 16px;
+    box-shadow:0 2px 12px rgba(18,35,61,.14);border:1px solid rgba(0,0,0,.06);background:#e8eef2}
+  .daymap .leaflet-popup-content-wrapper{border-radius:10px}
+  .daymap .leaflet-popup-content{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:#12233d;margin:8px 10px}
+  .pin{width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.4);border:2px solid #fff}
+  .pin span{transform:rotate(45deg);color:#fff;font-size:10.5px;font-weight:700;font-family:'Inter',sans-serif}
+  .maplegend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:14px 0 4px;font-size:12px;color:var(--muted)}
+  .maplegend span{display:inline-flex;align-items:center;gap:6px}
+  .maplegend i{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+
+  /* ══════════════ iOS SAFARI / MOBILE ══════════════ */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{overflow-x:hidden}
+  img,.daymap,.spot,.eat,.tcard,.wcard{max-width:100%}
+  .chip{-webkit-backdrop-filter:blur(4px)}
+  a,button{-webkit-tap-highlight-color:rgba(201,154,46,.25)}
+
+  /* portao de toque nos mapas: impede que o dedo fique preso no mapa ao rolar */
+  .mapgate{position:absolute;inset:0;z-index:900;display:flex;align-items:flex-end;
+    justify-content:center;padding-bottom:14px;cursor:pointer;
+    background:linear-gradient(180deg,rgba(18,35,61,0) 55%,rgba(18,35,61,.55) 100%)}
+  .mapgate span{background:rgba(255,255,255,.94);color:#12233d;border-radius:999px;
+    padding:7px 15px;font-size:12.5px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.28)}
+
+  @media(max-width:600px){
+    .wrap{padding:0 14px}
+    .hero{min-height:430px}
+    .hero-inner{padding:44px 16px 22px}
+    .hero h1{font-size:clamp(38px,11vw,54px)}
+    .hero .tag{font-size:16px}
+    .cbox{min-width:0;flex:1;padding:9px 10px}
+    .cbox b{font-size:22px}
+    .stats{padding:16px 0}
+    .stats .row{gap:10px 4px}
+    .stat{min-width:29%}
+    .stat b{font-size:25px}
+    .stat span{font-size:10px;letter-spacing:.1em}
+    h2{font-size:26px;line-height:1.15}
+    section{padding:26px 0 6px}
+    .navchips{gap:7px}
+    .navchips a{padding:10px 15px;font-size:13.5px}      /* alvo de toque >=40px */
+    .maplegend{gap:9px 12px;font-size:11.5px}
+    .daymap{height:230px}
+    .nhero{min-height:300px;border-radius:14px}
+    .partband span{font-size:11px;letter-spacing:.2em;white-space:normal}
+    .panorama{padding:16px 14px 4px}
+    .tlstop{font-size:12px;padding:3px 10px}
+    .spot img{height:180px}
+    .spot.wide img,.ph.tall{height:200px}
+    .ph{height:180px}
+    .check{padding:18px 16px}
+    .check li{font-size:14px;padding-left:30px}
+    .prkey{padding:14px 15px}
+
+    /* fotos empilhadas acima do texto: o texto fica com a largura toda */
+    .eat{flex-direction:column;align-items:stretch;gap:12px;padding:14px 15px}
+    .eat .eatthumb{width:100%;height:140px}
+    .eatthumbs{display:flex;gap:8px;width:100%}
+    .eatthumbs .eatthumb{flex:1 1 0;width:auto;height:118px}
+
+    /* tabela de financas -> cartoes empilhados (4 colunas nao cabem em 428px) */
+    .budget{padding:22px 16px;border-radius:14px}
+    .budget table,.budget tbody,.budget tr,.budget td{display:block;width:100%}
+    .budget tr.thead{display:none}
+    .budget tr{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.16)}
+    .budget tr:last-child{border-bottom:none}
+    .budget td{border:none;padding:2px 0}
+    .budget td:first-child{font-size:16px}
+    .budget td.amt{text-align:left;font-size:19px;color:#f0d38e;margin-top:5px}
+    .budget tr.total td{padding-top:4px}
+    .budget tr.total td.amt{font-size:23px}
+  }
+
+  @media(max-width:380px){
+    .hero h1{font-size:36px}
+    .eatthumbs .eatthumb{height:96px}
+    .stat{min-width:44%}
+  }
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Lisboa → Atenas → Náxos → Lisboa</div>
+    <h1>Atenas &amp; Náxos</h1>
+    <div class="tag">Oito dias no coração do Egeu — a cidade dos deuses e a ilha dourada das Cíclades.</div>
+    <div class="chips">
+      <span class="chip">📅 31 jul – 7 ago 2026</span>
+      <span class="chip">✈️ GQ923 / GQ922</span>
+      <span class="chip">⛴️ Seajets</span>
+      <span class="chip">🏛️ 2 dias de cidade</span>
+      <span class="chip">🏖️ 4 dias de ilha</span>
+    </div>
+    <div class="count" id="count">
+      <div class="cbox"><b id="cd">–</b><span>dias</span></div>
+      <div class="cbox"><b id="ch">–</b><span>horas</span></div>
+      <div class="cbox"><b id="cm">–</b><span>min</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="row">
+    <div class="stat"><b>8</b><span>dias</span></div>
+    <div class="stat"><b>2</b><span>destinos</span></div>
+    <div class="stat"><b>20+</b><span>locais</span></div>
+    <div class="stat"><b>6</b><span>praias</span></div>
+    <div class="stat"><b>2</b><span>pores-do-sol míticos</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="navchips">
+  <a href="#bookings">💶 Finanças</a>
+  <a href="#atenas">🏛️ Atenas · Dias 1–2</a>
+  <a href="#naxos" class="nx">🏖️ Náxos · Dias 3–6</a>
+  <a href="#flavours" class="nx">🧀 Comer &amp; Beber</a>
+  <a href="#regresso" class="nx">✈️ Regresso</a>
+  <a href="#checklist">☑️ Checklist</a>
+</div>
+
+<div class="maplegend">
+  <span><i style="background:#c99a2e"></i> Ponto de interesse</span>
+  <span><i style="background:#c96b3f"></i> Comida &amp; bebida</span>
+  <span><i style="background:#0e3a63"></i> Alojamento</span>
+  <span><i style="background:#6b7280"></i> Transporte</span>
+</div>
+
+<div class="meander"></div>
+
+<!-- WHY -->
+<section>
+  <h2>Porquê esta viagem?</h2>
+  <div class="why">
+    <div class="wcard"><div class="ico">🏛️</div><h3>História viva</h3>
+      <p>A Acrópole, a Ágora e o estádio dos primeiros Jogos Olímpicos modernos — 2.500 anos de civilização num passeio a pé.</p></div>
+    <div class="wcard"><div class="ico">🌅</div><h3>Dois pores-do-sol lendários</h3>
+      <p>O Licabeto sobre Atenas iluminada e a Portara de Náxos sobre o mar — os dois melhores fins de tarde da Grécia.</p></div>
+    <div class="wcard"><div class="ico">🏖️</div><h3>As melhores praias das Cíclades</h3>
+      <p>Areia dourada, água turquesa e tabernas com os pés na areia — e o alojamento fica mesmo em cima da praia.</p></div>
+  </div>
+</section>
+
+<!-- RESERVAS -->
+<div class="budget" id="bookings">
+  <h2>💶 Finanças da Viagem</h2>
+  <table>
+    <tr class="thead"><th>Item</th><th>Detalhes</th><th>Estado</th><th style="text-align:right">EUR</th></tr>
+    <tr>
+      <td><b>Voos LIS ⇄ ATH</b></td>
+      <td>GQ923 ida 31/07 23:30→05:30 · GQ922 volta 07/08 20:00→22:30 · A320neo<br>Tarifas 338 € + 320 €, taxas 100,80 €, serviços 28 €</td>
+      <td><span class="pill paid">PAGO</span></td>
+      <td class="amt">786,80</td>
+    </tr>
+    <tr>
+      <td><b>Hotel · Atenas</b></td>
+      <td>Aionion Residences by K&amp;K (Vasilis 9) · 01–03/08 · 2 noites · não reembolsável</td>
+      <td><span class="pill paid">PAGO</span></td>
+      <td class="amt">203,95</td>
+    </tr>
+    <tr>
+      <td><b>Ferry Pireu ⇄ Náxos</b></td>
+      <td>Seajets · ida 03/08 08:30→11:45 (69,70 €/pessoa) · volta 07/08 11:10→15:25 (77,70 €/pessoa)</td>
+      <td><span class="pill ind">INDICATIVO</span></td>
+      <td class="amt">147,40 <span style="font-weight:400;font-size:12px">/pessoa</span></td>
+    </tr>
+    <tr>
+      <td><b>Hotel · Náxos</b></td>
+      <td>Klimataria Studios · Agios Prokopios · 03–07/08 · 4 noites · cancelamento gratuito, pagamento na estadia</td>
+      <td><span class="pill paid">PAGO</span></td>
+      <td class="amt">488,00</td>
+    </tr>
+    <tr>
+      <td><b>Transportes locais</b></td>
+      <td>Metro aeroporto→centro ~9 € · centro→Pireu ~1,20 € · Pireu→aeroporto metro ~9 € (ou táxi ~40 €) · Uber para o Licabeto ~8 €</td>
+      <td><span class="pill ind">ESTIMATIVA</span></td>
+      <td class="amt">~30</td>
+    </tr>
+    <tr class="total"><td colspan="3">Total da viagem (voos + hotéis + ferry ×1 pessoa)</td><td class="amt">1.626,15 €</td></tr>
+  </table>
+  <div class="fineprint">O ferry é por pessoa — para dois viajantes o total passa a 1.773,55 €. Transportes locais são estimativas. Refeições não incluídas (contar ~40–60 €/pessoa/dia).</div>
+</div>
+
+</div>
+
+<div class="prkey">
+  <b>Como ler as bandas de preço dos restaurantes</b> — valor indicativo por pessoa, com entrada ou meze, prato principal e um copo de vinho ou cerveja:
+  <div class="row2">
+    <span><span class="pr">€</span> até ~15 €</span>
+    <span><span class="pr">€€</span> ~15–30 €</span>
+    <span><span class="pr">€€€</span> ~30–50 €</span>
+  </div>
+  <div class="note">Estimativas para agosto de 2026, não são preços confirmados — servem para decidires no momento, não para orçamentar. O peixe é quase sempre vendido ao quilo: pergunta o preço antes de escolher, é aí que a conta cresce.</div>
+</div>
+
+<!-- =========== PARTE I · ATENAS =========== -->
+<div class="athens-zone" id="atenas">
+<div class="wrap">
+
+<div class="partband athens"><span>ΜΕΡΟΣ Ι · Parte I — A Cidade dos Deuses</span></div>
+
+<!-- PANORAMA ATENAS -->
+<div class="panorama">
+  <h3>📍 Panorama · Dia a Dia</h3>
+  <div class="tl">
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Sex 31/07 → Sáb 1/08</span><span class="tll">Chegada</span></div>
+      <div class="tlstops"><span class="tlstop">✈️ Voo LIS→ATH</span><span class="tlarrow">→</span><span class="tlstop">🚇 Metro</span><span class="tlarrow">→</span><span class="tlstop">🏨 Hotel</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Sáb 1/08</span><span class="tll">Dia 1</span></div>
+      <div class="tlstops"><span class="tlstop">Acrópole</span><span class="tlarrow">→</span><span class="tlstop">Museu</span><span class="tlarrow">→</span><span class="tlstop">Ágora</span><span class="tlarrow">→</span><span class="tlstop">Areópago</span><span class="tlarrow">→</span><span class="tlstop">Plaka</span><span class="tlarrow">→</span><span class="tlstop">Anafiotika</span><span class="tlarrow">→</span><span class="tlstop">Monastiraki</span><span class="tlarrow">→</span><span class="tlstop">Licabeto</span><span class="tlarrow">→</span><span class="tlstop">🍸 Rooftop</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Dom 2/08</span><span class="tll">Dia 2</span></div>
+      <div class="tlstops"><span class="tlstop">Syntagma</span><span class="tlarrow">→</span><span class="tlstop">Jardim Nacional</span><span class="tlarrow">→</span><span class="tlstop">Estádio</span><span class="tlarrow">→</span><span class="tlstop">Kolonaki</span><span class="tlarrow">→</span><span class="tlstop">Le Greche</span><span class="tlarrow">→</span><span class="tlstop">Riviera</span><span class="tlarrow">→</span><span class="tlstop">🍹 Bar de praia</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHEGADA -->
+<section>
+  <span class="daytag">Sex 31 jul → Sáb 1 ago · Chegada</span>
+  <h2>A Chegada</h2>
+  <p class="lede">Voo noturno desde Lisboa — aterras ao nascer do dia com a jornada inteira pela frente.</p>
+  <div class="daymap" id="map-chegada"></div>
+  <div class="transit">
+    <div class="tcard"><div class="tk">✈️ Voo</div><div class="tt">GQ923 · LIS 23:30 → ATH 05:30</div><div class="td">Sex 31/07 · 4h00 · Airbus A320neo</div></div>
+    <div class="tcard"><div class="tk">🚇 Aeroporto → Hotel</div><div class="tt">Metro M3 · 06:07 → 07:01</div><div class="td">Direto até Monastiraki (54 min, ~9 €), depois 13 min a pé até ao Aionion Residences, Vasilis 9</div></div>
+    <div class="tcard"><div class="tk">🏨 Base</div><div class="tt">Aionion Residences by K&amp;K</div><div class="td">01–03/08 · 203,95 € · Confirmado · a dois passos de Monastiraki</div></div>
+  </div>
+  <div class="tip">💡 Vais chegar antes do check-in — deixa as malas no hotel, bebe um café grego bem forte e começa o Dia 1 cedo para fugires ao calor e às multidões da Acrópole.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 1 -->
+<section>
+  <span class="daytag">Sáb 1 ago · Dia 1</span>
+  <h2>Acrópole → Plaka → Monastiraki → Noite de Rooftop</h2>
+  <p class="lede">Um circuito suave, sempre a descer — de sul para norte, sem voltar atrás, a acabar a 5 minutos do hotel.</p>
+  <div class="daymap" id="map-dia1"></div>
+
+  <div class="grid">
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/2/2c/1029_Acrópole_of_Atenas_in_Grécia_at_night_Photo_by_Giles_Laurent.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEtNI9l6Q8IyTrvIvNXyz0OZIR0PII9DvdNCtsywEakdzdUi6G37FFkolE-vycdu0XcXbyfMUs2nKZSWHi41hpdscnB-KZh4pspYTTG-adzYBmOnKenku2AiNrrGSdA0OAci1ZFaSXqoGfw=w800-h600-k-no" alt="Acrópole de Atenas" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Manhã · começa cedo (portões às 08:00)</div><h3>Acrópole de Atenas <span class="greek">· Ἀκρόπολις</span></h3>
+      <p>O Pártenon, o Erectéion e os Propileus. Sobe logo de manhã — é a hora mais fresca e com menos gente. Compra o bilhete com hora marcada online, com antecedência.</p></div>
+    </div>
+    <div class="spot">
+      <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFdvHqzf1iJ95EiBklJhHT8iVq_SqSzMCJsttl6nzY3YhqMpaEOG4uOrcAs2bY21TA-w7E5Cf7fvflHtSzh6QsyBZg-JrEp5H0npp20ASOAkLET1-NquvgwdK1qdiqeApz8gQSI=w800-h600-k-no" alt="Museu da Acrópole" loading="lazy">
+      <div class="pad"><div class="time">Fim da manhã</div><h3>Museu da Acrópole</h3>
+      <p>Mesmo por baixo do rochedo — pisos de vidro sobre escavações e os mármores originais do Pártenon. 1h30–2h chegam. O café do terraço tem uma vista soberba.</p></div>
+    </div>
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/b/b8/Agora_-_Ath%C3%A8nes_%28GRA1%29_-_2022-03-26_-_97.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFhZmSc8_Y7100CKEtN6r_nJe63Aj_7vMhfTy5hUYhmjn-HJhYt3j2gV0RHze7eZjUwOjgSc4Gkai5w5lFa_iVKe36Nrc4aypiONHC-3V9gdhmcegVUjyLli3ULN2TcAtprdrOKf3UIBtkB=w800-h600-k-no" alt="Ágora Antiga de Atenas" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Meio-dia</div><h3>Ágora Antiga <span class="greek">· Ἀγορά</span></h3>
+      <p>O coração cívico da Atenas clássica, coroado pelo Templo de Hefesto, um dos mais bem preservados da Grécia. Caminhos com sombra — perfeito a esta hora.</p></div>
+    </div>
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/0/0d/Areopagus_hill.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAF4Qond-8Fku0v5rUAQW79LyGeTEWZCkA_ENcBbxRtJatjKZORfwqEoUV0a_RW9RaAIwdErLtPKL4OIrQghCKD-5OtqEOSk6723coRY1OhQlTDXc9ItQG0R7qhklynpgFfFUC9Y=w800-h600-k-no" alt="Colina do Areópago" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">A caminho, a descer</div><h3>Areópago <span class="greek">· Ἄρειος Πάγος</span></h3>
+      <p>Afloramento de mármore escorregadio com o melhor panorama gratuito da Acrópole e da cidade. Paragem rápida — 15 minutos.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMa25ARDxGcWpUyxKMPL5pRSC8yaLsvnIabR-gTMsu8A&s" alt="Guarantee" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7uLAvDddLny-qRr0QROXWiyMjbima3OwXQW0VtWANXQ&s" alt="Mani Mani" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Almoço · Koukaki (mesmo ali em baixo)</span><br>
+  <b>Guarantee</b> <span class="pr">€</span> — souvlaki e gyros de balcão, servidos em minutos. Poucas mesas, sem reserva, come-se e segue-se caminho. A escolha se estiveres com fome e sem paciência.<br>
+  <b>Mani Mani</b> <span class="pr">€€€</span> — cozinha do Peloponeso num primeiro piso calmo e com ar condicionado. Massa fresca da casa e pratos de porco; serviço atento. É a escolha para almoçar sentado com calma depois da Acrópole.
+  <span class="note">Os dois em Koukaki, a poucos minutos a pé um do outro e logo abaixo do Museu · Mani Mani: <b>reserva aconselhada</b> ao almoço em agosto · <b>Decisão rápida:</b> calor e pressa → Guarantee; pés destruídos e vontade de sentar → Mani Mani.</span></div></div>
+
+  <div class="grid">
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/a/a4/Carrer_del_barri_de_Plaka%2C_Atenes.JPG" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGfNp1p6qntTMFCkE5MNXXAlXSbiIo1Ad_a85V6nFPdJC69ke61tFoAFdQJf6Q19qQ7oGlehDqqlD0cRfd0g-bBGr2uBHdB7nbcrVVuXM7WW8uDc-HXACUEGIs6L3lEfSAimN1zmQ=w800-h600-k-no" alt="Plaka" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Tarde · a caminhar para norte</div><h3>Plaka</h3>
+      <p>O «bairro dos deuses» — ruelas neoclássicas, buganvílias e tabernas. Passeia sem mapa, é essa a graça.</p></div>
+    </div>
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/6/6a/Anafiotika.JPG" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFc422vC90CGSNyXks9sQIQLbGe2mUAnsDGxqpyQe4eri6ZeOjO4O4kSzPjefoMrmLfGQBXCiQs42LVSpSra0E7RUDVJ-t48r6ayWSqOKH89n8N3L6Kyi_whxr-ZdmfdAybuYDV=w800-h600-k-no" alt="Anafiotika" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Tarde</div><h3>Anafiotika</h3>
+      <p>Uma minúscula aldeia branca das Cíclades escondida na encosta da Acrópole — uma antevisão de Náxos ainda antes de embarcares.</p></div>
+    </div>
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/0/03/Monastiraki_Square_on_June_6%2C_2020.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGxAuugm_ewawHe-gbCE9AjWn5A5rSLXBSpQ4gVL6OIiFC1tjUi5dxFE2INncnKxDuM6vNadPR2BpWAKDvmX7GHhod9B1wlaGmQDb0gVI5DIuufRoDhwHpi5lOhX_341Vm1-6TqDhSuFm8=w800-h600-k-no" alt="Praça Monastiraki" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Fim de tarde</div><h3>Monastiraki <span class="greek">· Μοναστηράκι</span></h3>
+      <p>Feira da ladra, comida de rua, a mesquita Tzistarakis e a Acrópole a pairar sobre tudo. Estás praticamente em casa — o hotel fica a dois passos.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlCBTzT3zkjrt9ZHZSJ699OLB8FtPDHrFSLuGrsmlq0f2FM6ZjkYAWmNr9mS2vY7zyveLjOnWZmsvO5yAqWVI0JlrHpsgz6CP19MQma0j4b-adfVenkl2Q1fm2R70zk7daSdwgfmzM6LtT-=w800-h600-k-no" alt="Thanassis" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🥙 Petisco rápido · Monastiraki, Rua Mitropoleos</span><br>
+  <b>Thanassis</b> <span class="pr">€</span> — o kebab mais famoso de Atenas, na esquina de Monastiraki. Balcão para levar e mesas na rua; há quase sempre fila, mas escoa depressa. Pede o kebab em pita para picar, ou no prato se quiseres refeição.
+  <span class="note">Sem reserva · muito turístico e barulhento, mas a comida justifica · a 2 min do hotel, dá para parar de passagem sem alterar o resto do dia.</span></div></div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtNn9F0gfiaRzV379ZbN9k2QfaFW9gBVOwURxdWD5DhQ&s" alt="Lukumades" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmW-wiZlg6z_BBZbY1kzdIQ4J21c-gtElj_2urS_-HRmfkmAiUBC88CB2QuMb6GiVuQ7mwvsuBUHujp4ruQejFP-56WnyVMWgN8Oo0kKNqc-vOYHzGoEl7WxMBPJp83nLLPasvMDmNTGKUY=w800-h600-k-no" alt="Nancy's Sweet Home" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍯 Doce · a meio da tarde, Monastiraki &amp; Psyri</span><br>
+  <b>Lukumades</b> <span class="pr">€</span> — loukoumades feitos na hora: bolinhos fritos quentes com mel e canela, ou versões com chocolate e frutos secos. Come-se de pé, em cinco minutos.<br>
+  <b>Nancy's Sweet Home</b> <span class="pr">€</span> — pastelaria grega clássica na Platia Iroon, dois passos dali: bougatsa, baklava, galaktoboureko. Tem mesas na praça se preferires sentar-te e descansar.
+  <span class="note">Ambos em Monastiraki/Psyri, sem reserva e sem desvio · <b>Decisão rápida:</b> a andar → Lukumades; a precisar de pausa com sombra → Nancy's.</span></div></div>
+
+  <div class="grid">
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/6/6d/%CE%9B%CF%85%CE%BA%CE%B1%CE%B2%CE%B7%CF%84%CF%84%CF%8C%CF%82_-_Mount_Lycabettus.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAH8U3AWanUuA9Y4rLORIAg6loT8TDWeB7h3L3ZtZlPqLCycn_CH_e943GXXyMgFhC4-KVOhKnENJAgtVJO9NAlQ65fiL3RYSML2gi1sC9zcMZAgQM3FGjIT9YE6w_Uz0_gncR9L=w800-h600-k-no" alt="Monte Licabeto" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Pôr-do-sol · Uber até cima (~8 €)</div><h3>Licabeto <span class="greek">· Λυκαβηττός</span></h3>
+      <p>O ponto mais alto de Atenas. Sobe de carro, vê a cidade ficar dourada e a Acrópole acender-se ao cair da noite.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3jTEeVDkGqUBwkE7QmnvQEXT-mLPBFgRgp3fcVnwsSQ&s" alt="Oineas" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdQWUfM3wBBbh37Kl0yhxYQKHviMhX-4KXD-KLTdbUOg&s" alt="Kuzina" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Jantar · centro</span><br>
+  <b>Oineas</b> <span class="pr">€€</span> — grego moderno em Psyri, animado e informal, decoração de bric-à-brac e doses generosas. Bom para pedir vários pratos e partilhar.<br>
+  <b>Kuzina</b> <span class="pr">€€€</span> — cozinha grega criativa e terraço com o Pártenon em frente. Mais formal, mais caro, e a vista é metade da razão para ir.
+  <span class="note">Kuzina: <b>reserva obrigatória</b> e pede explicitamente mesa no terraço, senão ficas na sala sem vista · Oineas: costuma haver lugar, mesmo sem reserva · <b>Decisão rápida:</b> noite especial e fotografias → Kuzina; jantar descontraído e conta menor → Oineas.</span></div></div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlFX5SWLa3QMXTU9zDTC8BT2NFIgFO-A7_uyzhq-pA30sz6S-rd3yC3bbHtgZKSw_6yLkgxHHUfpAT8ZBk9SWHadg_yABwpOja-qX6nce4lDtjt-TBN9GMOPD59WNlLEx_MadMd0J-FaKiT=w800-h600-k-no" alt="Ristorante Atlantikos" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmHvOwRedlG5w9Rz6eFAyYFzreWZpHsVKzyvVN_t2egW4MMiP-zMuTDZ6KrJBPYPsGFAdOtuqj7bjilgoygcVwg45f3bC67RunQn2Uxjz9iJ3xNLGB4P1n0Y_-DjxV4VY0TkmotK44CyljZ=w800-h600-k-no" alt="Rozalia" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Jantar · alternativas, um curto passeio/táxi</span><br>
+  <b>Atlantikos</b> <span class="pr">€€</span> — marisqueira pequena e animada em Psyri (Avliton 7). Peixe e marisco simples, grelhado, escolhido à vista. Poucas mesas e muito movimento.<br>
+  <b>Rozalia</b> <span class="pr">€€</span> — taverna clássica de Exarchia com pátio coberto de vinha. Mezes num carrinho que passa pelas mesas: escolhes a apontar, o que resolve a ementa em grego.
+  <span class="note">Atlantikos: 5 min a pé do hotel · Rozalia: 10 min de táxi, bairro mais alternativo e com muito poucos turistas · <b>Decisão rápida:</b> quer peixe → Atlantikos; quer petiscar muitas coisas → Rozalia.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍽️ Jantar · as duas escolhas tradicionais</span><br>
+  <b>Scholarchio</b> <span class="pr">€€</span> — taberna tradicional na Plaka, em casa antiga com esplanada em socalcos. Trazem à mesa um tabuleiro com os mezes do dia e escolhes a apontar — a maneira mais fácil de comer bem sem decifrar a ementa. Fica em cima do percurso de hoje.<br>
+  <b>Aster</b> <span class="pr">€€</span> — grego tradicional em Petralona, bairro residencial praticamente sem turistas: come-se muito bem pelo preço. Única desvantagem, e é real: fica longe das atrações, ~10 min de táxi de Monastiraki.
+  <span class="note">Nenhum dos dois é caro · <b>Decisão rápida:</b> já andaste 15 km hoje → Scholarchio, sem táxi e sem pensar; ainda tens energia e queres o jantar mais autêntico da viagem → Aster.</span></div></div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGB44F-rcNFzv6QtxSoqh1zf_SlYp1-p5IbPA68Ti3ww&s" alt="360 Cocktail Bar" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsiAd2B6XxTWd6i2HcPh4b-6iHdH0G_ao3MLM5G61bXA&s" alt="Six D.O.G.S" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍸 Copo depois do jantar · rooftop ao ar livre, a 5 min do hotel</span><br>
+  <b>360 Cocktail Bar</b> <span class="pr">€€</span> — rooftop sobre a praça de Monastiraki, com a Acrópole iluminada em frente. Cocktails na casa dos 12–15 €. Enche cedo: aparece antes das 21:00 ou <b>reserva</b>.<br>
+  <b>Six D.O.G.S</b> <span class="pr">€</span> — pátio ao ar livre escondido entre edifícios, ambiente descontraído e bem mais barato. Não tem vista, tem árvores e música.
+  <span class="note">Os dois a 5 min do hotel, regresso a pé · <b>Decisão rápida:</b> quer a vista e não se importa de pagar → 360; quer sentar-se à vontade e conversar → Six D.O.G.S.</span></div></div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 2 -->
+<section>
+  <span class="daytag">Dom 2 ago · Dia 2</span>
+  <h2>Syntagma → Kolonaki → Gelado → Riviera</h2>
+  <p class="lede">Manhã central e tranquila, almoço chique, e depois direto para a costa — sem regressar à cidade, energia poupada.</p>
+  <div class="daymap" id="map-dia2"></div>
+
+  <div class="grid">
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/f/fd/%CE%A0%CE%BB%CE%B1%CF%84%CE%B5%CE%AF%CE%B1_%CE%A3%CF%85%CE%BD%CF%84%CE%AC%CE%B3%CE%BC%CE%B1%CF%84%CE%BF%CF%82_6386.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEfm_coBvYwJ-lqh36C_HlDZCyDtnPjgNIAuCGOC9DXWfjWYpvJlA0osy4X5-RXS5YK-hL5RTiCFCZkEy1WbW2qWZYCjt_ff8I-OSbB7duqVcMRuGiFqm-eHCTvENw-2qrtMkJPthWgZCX5=w800-h600-k-no" alt="Praça Syntagma" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Manhã</div><h3>Praça Syntagma</h3>
+      <p>O Parlamento e a rendição da guarda dos Evzones — acontece à hora certa, todas as horas.</p></div>
+    </div>
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/d/d0/%CE%95%CE%B8%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CE%9A%CE%AE%CF%80%CE%BF%CF%82.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEnMXP4G_z6P2svx86TwQUHlcYgpV7Fnnk7HS3rAOD67528Ylw1LqqzUAoa-_NYquN1WxKWk_VYFRTf6sBawL4YZ9agg4rBRWCv1umdKVQaeOF0h72kDU5OeN6NAkidkwOV3GXWPA=w800-h600-k-no" alt="Jardim Nacional" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Manhã</div><h3>Jardim Nacional</h3>
+      <p>Caminhos sombreados de palmeiras mesmo atrás do Parlamento — o atalho verde e fresco até ao estádio.</p></div>
+    </div>
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/9/98/Panathenaic_Stadium_-_panoramio_%281%29.jpg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLQa74vGmKhe1LaHhz2ZlZPOL_kjgNZ9X0Mq13rKAL-Q&s" alt="Estádio Panatenaico" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Fim da manhã</div><h3>Estádio Panatenaico <span class="greek">· Καλλιμάρμαρο</span></h3>
+      <p>O estádio todo em mármore dos primeiros Jogos Olímpicos modernos (1896). Sobe ao pódio — obviamente.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLXERCt55bKECkkRdbX-88K79vmG_HEDlZZbl3r_sCCA&s" alt="Philos Athens" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4gowFo4awlvkd1awiWfg2PlovESNPL7buAvh4VYmMUA&s" alt="To Kafeneio" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Almoço · Kolonaki</span><br>
+  <b>Philos Athens</b> <span class="pr">€€</span> — café-bistrô numa casa neoclássica de Kolonaki, com pátio interior. Pratos leves, saladas, brunch. Ideal para escapar ao calor do meio-dia sem uma refeição pesada.<br>
+  <b>To Kafeneio</b> <span class="pr">€€</span> — clássicos gregos à moda antiga, serviço formal de sempre e clientela local mais velha. Mais tradicional, pratos mais substanciais.
+  <span class="note">Ambos em Kolonaki, à mesma distância do Estádio · <b>Decisão rápida:</b> vais para a praia à tarde e não queres peso → Philos; queres almoço a sério antes da viagem até à costa → To Kafeneio.</span></div></div>
+
+  <div class="eat"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEhtUycL8vIcZadR8ZVQonvJT5So-zqjkgN-KtwvqGaMWJ9vR2kKqr5ru5MectgsHEAuPI8yE9uQi5zjgnIQ-1NYH-IM_KT0CI6Uc93JdZ-HZwG5LiIEEBUd-Y-mibSySSiWT9mcLJQlLI=w800-h600-k-no" alt="Le Greche" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍦 Doce · na mesma zona, sem desvios</span><br>
+  <b>Le Greche</b> <span class="pr">€</span> — gelataria artesanal apontada como a melhor de Atenas, feita por uma italiana. Pistácio e os sorvetes de fruta são o forte; bola a partir de ~3 €. Balcão pequeno, sem mesas.
+  <span class="note">A dois passos do almoço em Kolonaki, zero desvio · perfeito para comer a andar em direção ao táxi/tram para a costa.</span></div></div>
+
+  <div class="grid">
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/a/a7/Vouliagmenis_lake.JPG" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGaol08gceMTd_XIv5xUKf_f-7vJVkzTyGgsBZ_h1PIM0YKQw4LifqIXxUwVYDLs30duFevWJWh8Ue9HJMeqTRZdBFzxq3B4IuiAUvu73_xx3MAyoOnQ0R8mSUkjqdSNGhmnf1Rze3JPMFs=w800-h600-k-no" alt="Lago Vouliagmeni" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Tarde · direto para a costa (tram/autocarro ou ~30 min de Uber)</div><h3>Riviera Ateniense + Lago Vouliagmeni</h3>
+      <p>Banhos, espreguiçadeiras, passeio marítimo. Opcional: o Lago Vouliagmeni — um lago termal morno encaixado na falésia, aberto até ao pôr-do-sol. Fica pela costa ao fim do dia.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnZuzYV-hDd_vdmHp0as3l9NRjrUsAsHRZISIGPa6oV9-HyooNqecrtLDwdeHEOhitQlQixCKisN6m4yPVHgZF_oyNZ5APk7d7-6aqLelb-IfCMF-3mQ540BKC6vBgGKchNhnc=w800-h600-k-no" alt="Tasos Bakery" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🥐 Lanche da tarde · Glyfada</span><br>
+  <b>Tasos Bakery</b> <span class="pr">€</span> — padaria de bairro em Glyfada. Bougatsa (creme ou queijo), tiropita e spanakopita por poucos euros, quentes. Salva-vidas se o jantar ficar para tarde, como é hábito na Grécia.
+  <span class="note">Só take-away, sem mesas · a caminho da praia, dá para levar e comer na areia.</span></div></div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk__L_tBTfRcqjDOBcOUFYZ9ASvlOE7QaVycNSg5_WuosT6m3tigvu86O7vE2ZrSqAgRMXiQse4Zm_WGL_WUQgTkPgcKScIj_RPArQAPDHfrrVw3US8M21znUSGuy3uCpDkDEcnjw=w800-h600-k-no" alt="O Bakalis" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl_U_lCOtRtdt32W2Xmn7SxNtQlbI5kkTCfagw4OXVVpU7TDzAdkWPBwx_6G4USux6FcjXiecs_91WUiNCB3fz-13NNiBSz1zV5o8dg7z5qiRv5rkgyWVtPX4DSn6Sh4Yt0DD3pxQwmMo7A=w800-h600-k-no" alt="Ta Vlachika" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Jantar · taverna tradicional, Alimos &amp; Vari</span><br>
+  <b>O Bakalis</b> <span class="pr">€€</span> — taverna de bairro em Alimos: peixe fresco do dia, mezes e vinho da casa, clientela local. Sem cenário montado para turistas.<br>
+  <b>Ta Vlachika</b> <span class="pr">€€</span> — casa de carnes na grelha em Vari, grande e muito popular entre atenienses. Costeletas de cordeiro, espetadas, saladas — o oposto de comida de praia.
+  <span class="note">Vari fica mais para o interior, ~15 min de carro da costa; O Bakalis é junto ao mar em Alimos · ao fim de semana, <b>reserva</b> em Ta Vlachika · <b>Decisão rápida:</b> ficaste na praia até tarde → O Bakalis; tens carro/Uber e queres carne → Ta Vlachika.</span></div></div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnaXVnSS0I8ZuSYxmSwDA5UV3iDXbUvLnj5zbUFPC4gkTzyovtCpIeJYF31atC9bg1Fp19MlkgmtEVO1auXYx-TgHgqRoHS-NKFgYqk2o_QJUeXaq5-QRvckU_Gv1FK-HoGWNhOpw=w800-h600-k-no" alt="Ark" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmweb40XlEuh2AY-Kg8gLax8XOqII-JGfsBITw1XyqIZWiIDzoe712ke92rjDx8avk4n9J5uQ5vG5r02l6wf3QpQQRHLZl4e-XQG9kJFeIaRwJSBb1rxOoEulP3dqXhmQB808cP=w800-h600-k-no" alt="Riviera Kitchen and Grill" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Jantar · grelhados &amp; moderno, à beira-mar</span><br>
+  <b>Ark</b> <span class="pr">€€€</span> — grill contemporâneo em Glyfada, ambiente mais moderno e cuidado, carne e cocktails. O mais «noite fora» dos quatro jantares da Riviera.<br>
+  <b>Riviera Kitchen and Grill</b> <span class="pr">€€</span> — em Alimos, junto à marina: carta mista de grelhados e pratos gregos, esplanada descontraída com barcos em frente.
+  <span class="note">Se vieres do Lago Vouliagmeni, o Ark fica mais a caminho · <b>Decisão rápida:</b> quer arranjar-se e jantar bem → Ark; quer chinelos e vista de marina → Riviera Kitchen.</span></div></div>
+
+  <div class="eat"><img class="eatthumb" src="https://loremflickr.com/320/320/beach,bar,sunset?lock=108" alt="" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍹 Depois do jantar · ao ar livre, junto ao mar</span><br>
+  Bares de praia ao longo da Riviera <span class="pr">€€</span> — ar livre, brisa quente, música baixa e pés na areia. Cocktails ~10–14 €, cerveja ~5 €. Muitos emprestam espreguiçadeira com consumo mínimo.
+  <span class="note">Não é preciso reservar: escolhe pelo que estiver mais animado quando passares · última noite em Atenas, e a mala já está feita — não convém esticar muito.</span></div></div>
+</section>
+</div>
+</div>
+
+<!-- =========== PARTE II · NÁXOS =========== -->
+<div class="naxos-zone" id="naxos">
+<div class="wrap">
+
+<div class="partband naxos"><span>ΜΕΡΟΣ ΙΙ · Parte II — A Ilha Dourada</span></div>
+
+<!-- PANORAMA NÁXOS -->
+<div class="panorama">
+  <h3>📍 Panorama · Dia a Dia</h3>
+  <div class="tl">
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Seg 3/08</span><span class="tll">Dia 3</span></div>
+      <div class="tlstops"><span class="tlstop">⛴️ Ferry</span><span class="tlarrow">→</span><span class="tlstop">Chora &amp; Kastro</span><span class="tlarrow">→</span><span class="tlstop">Portara</span><span class="tlarrow">→</span><span class="tlstop">🍽️ Metaxi Mas</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Ter 4/08</span><span class="tll">Dia 4</span></div>
+      <div class="tlstops"><span class="tlstop">Agios Prokopios</span><span class="tlarrow">→</span><span class="tlstop">Agia Anna</span><span class="tlarrow">→</span><span class="tlstop">Praia de Plaka</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Qua 5/08</span><span class="tll">Dia 5</span></div>
+      <div class="tlstops"><span class="tlstop">Halki</span><span class="tlarrow">→</span><span class="tlstop">Filoti</span><span class="tlarrow">→</span><span class="tlstop">Apeiranthos</span><span class="tlarrow">→</span><span class="tlstop">Monte Zas</span><span class="tlarrow">→</span><span class="tlstop">Templo de Deméter</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Qui 6/08</span><span class="tll">Dia 6</span></div>
+      <div class="tlstops"><span class="tlstop">Mikri Vigla</span><span class="tlarrow">→</span><span class="tlstop">Alyko (opc.)</span><span class="tlarrow">→</span><span class="tlstop">Chora</span><span class="tlarrow">→</span><span class="tlstop">Portara (2ª vez)</span><span class="tlarrow">·</span><span class="tlstop">ou ⛵ Koufonisia</span></div>
+    </div>
+    <div class="tlday">
+      <div class="tlhead"><span class="tld">Sex 7/08</span><span class="tll">Regresso</span></div>
+      <div class="tlstops"><span class="tlstop">⛴️ Ferry</span><span class="tlarrow">→</span><span class="tlstop">🚇 Metro</span><span class="tlarrow">→</span><span class="tlstop">✈️ Voo ATH→LIS</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAXOS HERO -->
+<div class="nhero">
+  <div class="hero-inner">
+    <div class="kicker" style="letter-spacing:.3em;text-transform:uppercase;font-size:12px;font-weight:700;color:#f0d38e">Parte II · A Ilha</div>
+    <h1 style="font-size:clamp(40px,7vw,60px);font-weight:400">Náxos <span class="serif" style="font-size:.5em;opacity:.8">· Νάξος</span></h1>
+    <div class="tag" style="font-family:'GFS Didot',serif;font-style:italic;font-size:clamp(15px,2.6vw,19px);color:#e8eef7">Quatro noites na maior e mais autêntica ilha das Cíclades — onde Zeus cresceu e o mar é turquesa.</div>
+  </div>
+</div>
+
+<!-- DIA 3 -->
+<section>
+  <span class="daytag naxos">Seg 3 ago · Dia 3</span>
+  <h2>Manhã de Ferry → Fim de Tarde em Chora</h2>
+  <p class="lede">Check-out cedo, travessia do Egeu, e a primeira noite de ilha na cidade velha.</p>
+  <div class="daymap" id="map-dia3"></div>
+  <div class="transit">
+    <div class="tcard"><div class="tk">🚇 Hotel → Porto</div><div class="tt">Monastiraki → Pireu</div><div class="td">Metro M1 direto ~20 min (~1,20 €) ou táxi ~15 min. No portão de embarque às 07:45.</div></div>
+    <div class="tcard"><div class="tk">⛴️ Ferry</div><div class="tt">Seajets · 08:30 → 11:45</div><div class="td">Champions League Jet 1 · Pireu → Náxos · 69,70 €/pessoa</div></div>
+    <div class="tcard"><div class="tk">🏨 Base</div><div class="tt">Klimataria Studios</div><div class="td">Agios Prokopios · 03–07/08 · 488 € · Confirmado · praia à porta, autocarro/táxi para o porto e Chora ~10 min</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/0/0b/Náxos_%CE%9D%CE%AC%CE%BE%CE%BF%CF%82_2020-08-20_02_Chora_Grotta_and_Vintzi_beaches.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGjGccgym9Ih0PhcEgItEsANb578Qr7Iqt0DKr1nt8AmyfXBs2eA814BWRBZ8eh-dNn4OL9HO4ux9l0oVsxuzc8D99cw0xhkicwnhKtEGfL3HCRu_KVZFoeQD7C55oV5I0Ak7Rw=w800-h600-k-no" alt="Chora, Náxos" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Tarde</div><h3>Chora &amp; Kastro <span class="greek">· Χώρα</span></h3>
+      <p>Sobe pelo labirinto de ruelas caiadas da cidade velha até ao castelo veneziano no topo. Perde-te de propósito — é esse o objetivo. Já lá em cima, passa pelo <b>Avaton</b>.</p></div>
+    </div>
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/4/4f/20221029_Náxos_762.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFE1ecqzRyLLnl7qnKcQm3XmvtjncMmE-S6wE5ATSV6iFRCoyl_S3gSSC-wihMsApEosWdVhCRofBhCzwZNCiQN3m3eqy9trT75_EGaosLR1AJPhygstvV0JtZQwfZkuTN_KiFdOkN4Z6g=w800-h600-k-no" alt="Portara" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Pôr-do-sol · o clássico</div><h3>Portara <span class="greek">· Πορτάρα</span></h3>
+      <p>A porta colossal de mármore do templo inacabado de Apolo, no seu próprio ilhéu. O pôr-do-sol de Náxos — chega cerca de 45 min antes para garantires um bom lugar, porque fica muito concorrido.</p></div>
+    </div>
+  </div>
+
+  <div class="eat"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvvd-uM9Yl0-4ENn2OT5Cb0kM_7d-VVbvTtcTux9aeVOKTn1FXn9eUMKebLQ&s" alt="Metaxi Mas" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍽️ Jantar · marginal / cidade velha</span><br>
+  <b>Metaxi Mas</b> <span class="pr">€€</span> — taberna pequena e muito estimada, numa ruela da cidade velha. Mezes, queijos da ilha e vinho a copo. Não tem vista: vai-se pela comida e pelo ambiente.<br>
+  Em alternativa, <b>qualquer mesa na marginal</b> <span class="pr">€€</span> — mais turístico e um pouco mais caro, mas com os barcos à frente e sem espera.
+  <span class="note">Metaxi Mas enche em agosto: <b>reserva</b> ou aparece antes das 20:00 · <b>Decisão rápida:</b> primeira noite e queres cenário → marginal; queres comer bem → Metaxi Mas.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍸 Lá em cima, no Kastro · comida, cocktails, ambiente</span><br>
+  <b>Avaton</b> <span class="pr">€€€</span> — dentro do bairro do castelo, no ponto mais alto da cidade velha. Comida excelente, cocktails muito bons e o melhor ambiente de Chora. Serve jantar e prolonga-se como bar, por isso dá para fazer aqui a noite toda.
+  <span class="note"><b>Reserva com antecedência</b>, sobretudo se quiseres mesa fora · subida a pé por escadas e calçada — nada de sapatos difíceis · é o sítio a guardar para a noite que quiseres que conte.</span></div></div>
+
+  <div class="tip">🌙 <b>Chora é o centro da vida noturna da ilha</b> — bares nas ruelas da cidade velha e ao longo da marginal, todos a curta distância a pé. Sempre que quiseres uma noite a sério, é aqui e não em Agios Prokopios. As escolhas estão na secção <a href="#flavours" style="color:inherit;font-weight:700">Comer &amp; Beber</a>.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 4 -->
+<section>
+  <span class="daytag naxos">Ter 4 ago · Dia 4</span>
+  <h2>Dia de Praia — A Costa Oeste</h2>
+  <p class="lede">Náxos tem as melhores praias das Cíclades. Uma faixa dourada, três ambientes.</p>
+  <div class="daymap" id="map-dia4"></div>
+
+  <div class="grid">
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/1/1c/Náxos8.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAE-jV8Mygd8ha8A_Fo5HMakuS_fIat6-ln8RhJEj1Bbv2dUxTCtYXb8DArL8RW2F1qCrKMpPaJSuz7rArEfJ7vDrny9VE_AshCud6cvPrfi6DwnVIbdK-45-khhgwh5ZPiT5FHKYUmVdDoR=w800-h600-k-no" alt="Praia de Agios Prokopios" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Manhã → tarde · começa à tua porta</div><h3>Agios Prokopios → Agia Anna → Praia de Plaka</h3>
+      <p>Estás alojado mesmo aqui — sais da cama para Agios Prokopios (água turquesa cristalina, uma das praias mais bonitas da ilha), caminhas para sul até Agia Anna, um areal lindo cheio de tabernas tradicionais à beira-mar, e continuas até Plaka — uma longa fita de areia dourada que vai esvaziando quanto mais andares, e o sítio certo para passar um dia inteiro.</p></div>
+    </div>
+  </div>
+
+  <div class="chiprow">
+    <div class="chipitem"><img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAE-jV8Mygd8ha8A_Fo5HMakuS_fIat6-ln8RhJEj1Bbv2dUxTCtYXb8DArL8RW2F1qCrKMpPaJSuz7rArEfJ7vDrny9VE_AshCud6cvPrfi6DwnVIbdK-45-khhgwh5ZPiT5FHKYUmVdDoR=w800-h600-k-no" alt="Agios Prokopios">Agios Prokopios</div>
+    <div class="chipitem"><img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAF8zuaEWYwQ49CmRh9-z4_SvCWRBkBicTHSSFX13qSWwc8BvVeuS0HVC1W6tln_ytnPMwA19_E30mCdrZDiG_YNe4W8vGVEwNqv0RW5BhauicqNNjIi-rStGPhB-sLDZyRmyFy7=w800-h600-k-no" alt="Agia Anna">Agia Anna</div>
+    <div class="chipitem"><img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFcpeO6IGwpS6sxNqRKoxrswY4OBfQg7HESy-JysEB1F3UKuoefDKJrFn-mNJ6y40WmTIAyRAKYZiXgyb7Mpk159u_Z7KoiTkCAGBCaJBr1qqXEocI2NcV3jdGH2DjlbOm7T0zBnqBl9UXl=w800-h600-k-no" alt="Praia de Plaka">Praia de Plaka</div>
+  </div>
+
+  <div class="tip">🐟 <b>Dica local · Agios Prokopios.</b> Há uma pequena igreja construída nas rochas, numa das pontas da praia — é ali que a maioria dos locais se banha, longe dos bares de praia cheios. Melhor água, menos gente.</div>
+
+  <div class="eat"><img class="eatthumb" src="https://loremflickr.com/320/320/grilled,fish,plate?lock=110" alt="" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍽️ Almoço · Agia Anna, pés na areia</span><br>
+  <b>Picasso Restaurant</b> <span class="pr">€€</span> — a escolha dos locais em Agia Anna. Espreita a ementa à porta antes de te sentares, para saberes o que vais pedir.<br>
+  Em alternativa, <b>qualquer taberna do areal</b> <span class="pr">€€</span> — peixe grelhado, salada grega, batatas de Náxos e uma Mythos gelada, com os pés na areia. Pergunta sempre o preço do peixe ao quilo antes de escolher.
+  <span class="note">Sem reserva ao almoço · em muitas destas tabernas a espreguiçadeira sai grátis com consumo, o que resolve a tarde de uma vez · a pé desde Agios Prokopios, ~20 min pela areia.</span></div></div>
+
+  <div class="eat"><img class="eatthumb" src="https://loremflickr.com/320/320/cocktail,beach?lock=111" alt="" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍹 Pôr-do-sol</span><br>
+  Bar de praia em Plaka <span class="pr">€€</span> — cocktails enquanto o sol desce atrás de Paros, do outro lado do canal. Cocktail ~10–12 €, cerveja ~5 €; a maioria empresta espreguiçadeira com consumo mínimo.
+  <span class="note">Sem reserva · quanto mais para sul andares na praia, mais calmo e mais barato fica.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍽️ Jantar · direto da praia</span><br>
+  <b>Paradiso Taverna</b> <span class="pr">€€</span> — em plena praia de Plaka, com mesas praticamente na areia. Taberna grega simples e bem feita: é o género de sítio onde se entra de chinelos, com o cabelo ainda salgado, e se fica até o sol se ir.
+  <span class="note">Normalmente sem necessidade de reserva · fica a ~10 min de carro do alojamento, ou no fim da caminhada da praia se ainda tiveres pernas · <b>Decisão rápida:</b> é a opção «não quero decidir nada» do Dia 4.</span></div></div>
+
+  <div class="tip">💡 Aluga hoje ou amanhã uma scooter/ATV ou um carro pequeno (~25–45 €/dia) — torna as praias e as aldeias da montanha um passeio.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 5 -->
+<section>
+  <span class="daytag naxos">Qua 5 ago · Dia 5</span>
+  <h2>Estrada — As Aldeias da Montanha</h2>
+  <p class="lede">O interior é o que torna Náxos diferente — aldeias de mármore, laranjais e a montanha onde Zeus cresceu. Aluga carro e faz o percurso clássico: <b>Halki → Filoti → Apeiranthos</b>.</p>
+  <div class="daymap" id="map-dia5"></div>
+
+  <div class="grid">
+    <div class="spot">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/4/40/%CE%A0%CE%B1%CE%BD%CE%B1%CE%B3%CE%AF%CE%B1_%CE%A0%CF%81%CF%89%CF%84%CF%8C%CE%B8%CF%81%CE%BF%CE%BD%CE%BF%CF%82_%CF%83%CF%84%CE%BF_%CE%A7%CE%B1%CE%BB%CE%BA%CE%AF.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGEQ2_ge8-STb_nYd90UjGJrLGdpbA5jR3TOsE1zErwQKmyb5WlE-b8Y1_1agkGBIONFl6cZYxbsPzn1SMBZOiAxUzCDQqlQrt2gufNmqJLMqbQ4pfbjIgf4AvAlidXkSi0WxYp=w800-h600-k-no" alt="Halki, Panagia Protothronos" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Manhã · 25 min de carro</div><h3>Halki <span class="greek">· Χαλκί</span></h3>
+      <p>A elegante antiga capital do interior. Passeia pelas ruelas encantadoras e prova o famoso kitron na destilaria Vallindras (prova gratuita do licor de cidra da ilha), e vê a igreja bizantina de Panagia Protothronos.</p></div>
+    </div>
+    <div class="spot">
+      <div class="ph"><div class="ph-ico">🌳</div><div class="ph-t">Filoti · a praça do plátano</div></div>
+      <div class="pad"><div class="time">Fim da manhã · a aldeia seguinte</div><h3>Filoti <span class="greek">· Φιλότι</span></h3>
+      <p>A maior das aldeias da montanha, espalhada pela encosta abaixo do Monte Zas. Para um café ou um almoço debaixo do enorme plátano da praça — é isso que se vem fazer a Filoti.</p></div>
+    </div>
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/7/7d/Apiranthos.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHPpn1A2FbWMt-rxTXrn9gH8hmOKW9GjAYUDD3N1xjTR5ZWh_VhrD3FsAAKdG9Wx3PvAdmTqlOaTfG_mafr0rRWbS8aGgMuI-L-yAiUhwZ2qwdxukCwXDB5UDQsrReFSZZJoSp8eQ=w800-h600-k-no" alt="Apeiranthos" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Meio-dia · o ponto alto</div><h3>Apeiranthos <span class="greek">· Απείρανθος</span></h3>
+      <p>A aldeia de mármore — todas as ruelas pavimentadas em pedra branca, agarrada à encosta. É a aldeia de montanha mais pitoresca da ilha e a favorita de quem cá vive. Almoça aqui numa taberna com vista para o vale.</p></div>
+    </div>
+    <div class="spot wide">
+      <img data-orig="https://upload.wikimedia.org/wikipedia/commons/6/67/Mt_Zas_naxos_1196172.jpg" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHdASl3P4k9078Sswown7jMsS_huul4ei4OS67gWQk-qkAJqdH9dnqDD9bzMx0ujPYe4yfSnb8C6DWLt0w8lAcLRf6gGT7qUSmRB9VQXHFnfuV17a3C17Zir2drud2ds9zeIaIe=w800-h600-k-no" alt="Monte Zas" loading="lazy" onerror="this.outerHTML='<div class=noimg></div>'">
+      <div class="pad"><div class="time">Tarde · opcional</div><h3>Monte Zas &amp; Templo de Deméter</h3>
+      <p>O pico mais alto das Cíclades (1.003 m) — reza o mito que Zeus foi criado na sua gruta. Faz o miradouro, ou troca pelo sereno templo de mármore de Deméter, perto de Sangri, no regresso.</p></div>
+    </div>
+  </div>
+
+  <div class="chiprow">
+    <div class="chipitem"><img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHvWb_O9QCj7CCn8OHTbtd00_bzj1N8rLLdwCaJe_3gAr7rrW17NttLR3dlBaMqMjoQk-9AKtwENf91QGk3xD1ISeJHQs0J2nV4aJNitMm1_JaEpO_X5p6lEvBDsr1IKP-Dmt65=w800-h600-k-no" alt="Templo de Deméter">Templo de Deméter, Sangri</div>
+  </div>
+
+  <div class="eat"><div class="eatthumbs"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS82WoHV74PVbnGXpUE_idWaKc6Gu1cEkUK_rRlDP1YsA&s" alt="Doukato" loading="lazy" onerror="this.style.display='none'"><img class="eatthumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNzCiPXzsKOWywO7Ya7n61BVx5FKgGsmhCtaFqSvhmjlBHMG0hMWXe9eFL&s" alt="Axiotissa" loading="lazy" onerror="this.style.display='none'"></div><div class="etxt"><span class="em">🍽️ Jantar · de volta a Chora</span><br>
+  <b>Doukato</b> <span class="pr">€€</span> — pátio de pedra na cidade velha de Chora, cozinha tradicional de Náxos bem executada. Um dos mais elogiados da ilha e o mais fácil de encaixar em qualquer noite, porque é a pé.<br>
+  <b>Axiotissa</b> <span class="pr">€€</span> — perto de Kastraki, a ~20 min de carro: taberna farm-to-table com ementa curta que segue o que há no dia. É uma experiência gastronómica a sério, não apenas um jantar.
+  <span class="note">Axiotissa: <b>reserva obrigatória</b> em agosto e é preciso carro (e alguém que não beba) · Doukato: reserva aconselhada · <b>Decisão rápida:</b> já conduziste a montanha toda hoje → Doukato.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🌄 Ou fica pela montanha · Apeiranthos</span><br>
+  <b>Rotonda</b> <span class="pr">€€</span> — em Apeiranthos, no alto da montanha: comida apontada como incrível e vista panorâmica sobre o vale até ao mar. Se calculares o passeio para acabar aqui ao anoitecer, ficas com a melhor mesa da ilha.
+  <span class="note"><b>Reserva com antecedência</b> — é a recomendação repetida por todos · implica descer a estrada de montanha no escuro, o que só é boa ideia se já a tiveres feito de dia · <b>Decisão rápida:</b> se o dia estiver limpo, vale mais do que qualquer jantar em Chora.</span></div></div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 6 -->
+<section>
+  <span class="daytag naxos">Qui 6 ago · Dia 6</span>
+  <h2>Dia Lento — Mikri Vigla &amp; o Último Pôr-do-Sol</h2>
+  <p class="lede">Nada agendado. É de propósito.</p>
+  <div class="daymap" id="map-dia6"></div>
+
+  <div class="grid">
+    <div class="spot wide">
+      <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFp15DlJ0T0PQ5bqdQGz1Gs077l6e7_oWprw1tYtwsUwgXraSgJE7mM3A5fxwIuIzsbpFFxjytF8Tk-ywxdjnVsa0pGz0zJ0AMjIz3C_-6eNAdRf8G87K3cBfMe7xHXJb6ifoMDVw=w800-h600-k-no" alt="Mikri Vigla" loading="lazy">
+      <div class="pad"><div class="time">Todo o dia</div><h3>Mikri Vigla → fim de tarde em Chora</h3>
+      <p>Manhã em Mikri Vigla — um cabo de areia que separa a baía do kitesurf de uma baía calma para nadar, famoso pelo cenário e pelas condições perfeitas para windsurf e kitesurf. Almoço longo e preguiçoso, banho à tarde, e regresso a Chora para compras nas ruelas do Kastro e um último pôr-do-sol na Portara (vais querer o segundo).</p></div>
+    </div>
+    <div class="spot">
+      <div class="ph"><div class="ph-ico">🌊</div><div class="ph-t">Alyko &amp; Hawaii · cedros e turquesa</div></div>
+      <div class="pad"><div class="time">Opcional · 10 min mais para sul</div><h3>Alyko &amp; Praia Hawaii</h3>
+      <p>Um canto bem mais isolado — floresta de cedros, paisagem selvagem e água turquesa incrível. Um aviso: se estiver vento, não te banhes aqui, o mar fica agitado depressa.</p></div>
+    </div>
+    <div class="spot">
+      <div class="ph"><div class="ph-ico">⛵</div><div class="ph-t">Koufonisia · cruzeiro de um dia</div></div>
+      <div class="pad"><div class="time">Grande alternativa · troca o dia todo</div><h3>Koufonisia <span class="greek">· Κουφονήσια</span></h3>
+      <p>Se o tempo ajudar, um cruzeiro de um dia a Koufonisia é a melhor coisa que se pode fazer com um dia livre aqui — algumas das águas turquesa mais impressionantes das Cíclades. Reserva no dia anterior e confirma o vento.</p></div>
+    </div>
+  </div>
+
+  <div class="tip">💡 Há duas maneiras de passar o dia: a versão lenta e local (Mikri Vigla, talvez Alyko, pôr-do-sol em Chora) ou a grande (cruzeiro a Koufonisia, de volta a tempo da Portara). Decide na noite anterior, em função do vento.</div>
+
+  <div class="eat"><img class="eatthumb" src="https://loremflickr.com/320/320/wine,cheese,dinner?lock=113" alt="" loading="lazy" onerror="this.style.display='none'"><div class="etxt"><span class="em">🍽️ Jantar de despedida</span><br>
+  Noite de extravagância <span class="pr">€€€</span> — mesa junto à água em Chora ou no portinho de Agia Anna. Pede o queijo graviera local, batatas de Náxos, cordeiro, e um kitron para terminar. Conta ~35–50 €/pessoa com vinho num sítio à beira-mar em Chora.
+  <span class="note"><b>Reserva</b> se quiseres mesa na primeira fila, virada ao mar — são poucas e vão primeiro · Agia Anna é mais calmo e mais barato; Chora tem o cenário.</span> <span class="greek">Στην υγειά μας! (À nossa!)</span></div></div>
+</section>
+
+<div class="meander"></div>
+
+<!-- SABORES LOCAIS -->
+<section id="flavours">
+  <span class="daytag naxos">Extra · O que comer</span>
+  <h2>Sabores Locais — A Lista Obrigatória</h2>
+  <p class="lede">Náxos é uma ilha agrícola antes de ser uma ilha de praia, e a comida segue essa lógica. Uma regra de quem cá vive: <b>não te fixes nas marisqueiras</b> — Náxos é muito mais famosa pela carne do que pelo peixe.</p>
+
+  <div class="check">
+    <ul>
+      <li><b>Batatas de Náxos</b> — é mesmo por isto que todos se derretem. Pede em todos os sítios</li>
+      <li><b>Graviera</b> — o queijo emblemático da ilha, firme e com sabor a frutos secos</li>
+      <li><b>Arseniko</b> — duro, intenso, curado. É este que se traz para casa</li>
+      <li><b>Xinomizithra</b> — fresco e acidulado; é bom, embora não seja o favorito de todos</li>
+      <li><b>Cordeiro e carne local de todo o tipo</b> — é nisto que a ilha é melhor</li>
+      <li><b>Kitron</b> — o licor de cidra local. Compra o autêntico no <b>Promponas</b>, uma loja tradicional perto do porto</li>
+    </ul>
+  </div>
+
+  <div class="tip">🛍️ O Promponas fica perto do porto, por isso dá uma última paragem fácil no Dia 7, antes do ferry — queijo e kitron viajam bem na bagagem.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- SUGESTÕES -->
+<section>
+  <span class="daytag naxos">Extra · Onde comer</span>
+  <h2>Mais Tabernas — Escolhas de Locais e de Viajantes</h2>
+  <p class="lede">A lista curta de quem cá vive, mais recomendações recolhidas na comunidade r/GréciaTravel — encaixa-as no dia em que estiveres mais perto. <b>Doukato</b> (já no Dia 5) é dos mais elogiados.</p>
+
+  <div class="eat"><div class="etxt"><span class="em">🍽️ Chora · a lista dos locais</span><br>
+  <b>Meze Meze</b> <span class="pr">€€</span> — taberna grega em Chora, informal e boa para uma noite normal. O <b>risotto</b> é obrigatório e as <b>lulas</b> vêm especialmente recomendadas; o resto da carta são mezes para partilhar.<br>
+  <b>Ladoxarto</b> <span class="pr">€€</span> — outra favorita em Chora. Recomendação local sem mais detalhe: vale espreitar a ementa à porta quando passares.<br>
+  <b>To Spitiko</b> <span class="pr">€</span> — o melhor souvlaki grego da ilha, de balcão. Gyros em pita por poucos euros: a solução para jantar barato antes de sair, ou para o caminho de volta a casa.
+  <span class="note">Os três a poucos minutos a pé entre si, em Chora · só Meze Meze e Ladoxarto justificam reserva.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍨 Sobremesa · inegociável</span><br>
+  <b>Waffle House</b> <span class="pr">€</span> — waffles e gelados em Chora, descrito sem meias palavras como o melhor gelado do mundo. Aberto até tarde e cheio depois do pôr-do-sol.
+  <span class="note">Encaixa perfeitamente depois da Portara: pôr-do-sol, depois gelado, depois um copo · não saias de Náxos sem provar.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🏖️ Tabernas de praia</span><br>
+  <b>Paradiso Taverna</b> <span class="pr">€€</span> — praia de Plaka, mesas na areia, perfeita depois de um dia no mar (já no Dia 4) · <b>Picasso Restaurant</b> <span class="pr">€€</span> — Agia Anna, a escolha dos locais no areal · <b>Victoria Cafe</b> <span class="pr">€</span> — o mais informal dos três, ver abaixo.
+  <span class="note">Todos a pé ou a poucos minutos de carro do alojamento — são as opções de dia de praia em que não tens de te arranjar.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍽️ Tabernas favoritas · cidade &amp; costa</span><br>
+  <b>Το Τραπεζάκι (Kottaki)</b> <span class="pr">€€</span> — <span class="greek">Ταβέρνα Το Τραπεζάκι</span>, uma das favoritas dos viajantes: taberna pequena e familiar. Recomendação sem mais detalhe, por isso conta com cozinha grega caseira e ementa do dia.<br>
+  <b>Faros tou Alykou</b> <span class="pr">€€</span> — <span class="greek">Ο Φάρος του Αλυκού</span>, junto à praia de Alyko, no sul da ilha.
+  <span class="note">Faros tou Alykou só faz sentido se fores a Alyko (Dia 6): é preciso carro, fica isolado e não há nada por perto — confirma o horário antes de conduzir até lá.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍽️ Imperdível</span><br>
+  <b>To Elliniko</b> <span class="pr">€€</span> — descrita como paragem obrigatória, sem mais detalhes na recomendação. Pede os pratos do dia: em tabernas assim é quase sempre onde está o melhor.</div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🌅 Pôr-do-sol · no alto da montanha</span><br>
+  <b>Rotonda</b> <span class="pr">€€</span> — em Apeiranthos (ver Dia 5): comida incrível, vistas panorâmicas, ideal ao fim da tarde. <b>Reserva com antecedência.</b>
+  <span class="note">Já está encaixado no Dia 5 — só o repetimos aqui porque é a recomendação mais forte da lista.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍕 Na praia · descontraído</span><br>
+  <b>Victoria Cafe</b> <span class="pr">€</span> — mesmo na areia, o mais informal da lista. Pizza, salada grega e um bolo de chocolate apontado como espetacular. Almoço de praia sem cerimónia, com espreguiçadeiras à porta.
+  <span class="note">Boa opção quando não te queres levantar da praia para almoçar · sem reserva.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🥬 Farm-to-table</span><br>
+  <b>Menu Me Nou</b> <span class="pr">€€</span> — cozinha da quinta à mesa, muito recomendada: ementa curta e produtos da ilha.
+  <span class="note">É a alternativa natural ao Axiotissa se este estiver cheio — e em agosto, muitas vezes está.</span></div></div>
+
+  <div class="eat"><div class="etxt"><span class="em">🍹 Vida noturna · é em Chora</span><br>
+  <b>Chora é onde a ilha sai à noite</b> — a vida noturna concentra-se na cidade velha e na marginal, e faz-se toda a pé, com poucos minutos entre bares. As escolhas dos locais <span class="pr">€€</span>: <b>The Rum Bar</b> · <b>Like Home</b> · <b>Swing Bar</b> · <b>Ocean</b>. Cocktails ~9–12 €, cerveja ~5 €.
+  <span class="note">São nomes recomendados sem descrição, por isso a melhor tática é começar num e ir andando, escolhendo pelo que estiver mais cheio · nada abre a sério antes das 23:00 · sem reserva · Agios Prokopios não tem nada disto: para uma noite a sério é preciso vir a Chora e contar com táxi na volta (~10 min).</span></div></div>
+
+  <div class="tip">💡 Combinações fáceis: <b>Faros tou Alykou</b> com um dia de praia em Alyko, no Dia 6 · <b>Rotonda</b> com o passeio pela montanha, no Dia 5 · <b>Victoria Cafe</b> ou <b>Paradiso</b> com o dia de praia, no Dia 4 · <b>Meze Meze</b>, <b>Ladoxarto</b>, <b>To Spitiko</b> e <b>Avaton</b> em qualquer noite em Chora.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- DIA 7 -->
+<section id="regresso">
+  <span class="daytag">Sex 7 ago · Dia 7</span>
+  <h2>Regresso — Ferry + Voo, Perfeitamente Encadeados</h2>
+  <p class="lede">Zarpas às 11:10, aterras em Lisboa às 22:30. Margens confortáveis do princípio ao fim.</p>
+  <div class="daymap" id="map-dia7"></div>
+  <div class="transit">
+    <div class="tcard"><div class="tk">⛴️ Ferry</div><div class="tt">Seajets · 11:10 → 15:25</div><div class="td">Champions League Jet 2 · Náxos → Pireu · 77,70 €/pessoa · no porto às 10:30</div></div>
+    <div class="tcard"><div class="tk">🚇 Porto → Aeroporto</div><div class="tt">Metro ~1h10 (~9 €) ou táxi ~40 min (~40 €)</div><div class="td">Sai do Pireu até às 16:30 → aeroporto ~17:30, 2h30 antes da partida</div></div>
+    <div class="tcard"><div class="tk">✈️ Voo</div><div class="tt">GQ922 · ATH 20:00 → LIS 22:30</div><div class="td">Sex 07/08 · Airbus A320neo · Pago</div></div>
+  </div>
+  <div class="tip">💡 Folga de manhã em Náxos: último mergulho em Agios Prokopios, mesmo à porta, antes de rumares ao porto.</div>
+</section>
+
+<div class="meander"></div>
+
+<!-- CHECKLIST -->
+<section id="checklist">
+  <h2>Antes de Partir</h2>
+  <div class="check">
+    <ul>
+      <li><b>Bilhetes da Acrópole</b> com hora marcada (08:00) — esgotam em agosto</li>
+      <li><b>Lugares no ferry Seajets</b> — confirmar a reserva e os lugares (preço indicativo: 147,40 €/pessoa ida e volta)</li>
+      <li><b>Museu da Acrópole</b> — bilhete online para saltar a fila</li>
+      <li><b>Aluguer em Náxos</b> (scooter/carro) — reservar para os dias 4–6; é preciso para as aldeias e para Alyko</li>
+      <li><b>Reservas de mesa</b> — <b>Rotonda</b> (Apeiranthos) e <b>Avaton</b> (Kastro) precisam de reserva antecipada</li>
+      <li><b>Cruzeiro a Koufonisia</b> — troca opcional do Dia 6; reservar no dia anterior e confirmar a previsão de vento</li>
+      <li><b>Protetor solar + chapéu</b> — agosto no Egeu não perdoa</li>
+      <li><b>Sapatos com sola aderente</b> — o mármore da Acrópole e do Areópago escorrega</li>
+      <li><b>Cartão de embarque + reservas offline</b> no telemóvel</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+</div>
+
+<footer>
+  <div class="big">Καλό ταξίδι, Tiago!</div>
+  Atenas &amp; Náxos · 31 jul – 7 ago 2026<br>
+  Fotografias: Google Maps &amp; Wikimedia Commons (carregadas online — é precisa ligação à internet)
+</footer>
+<!-- SCRIPTS -->
+<script>
+document.querySelectorAll('.spot img,.hero img').forEach(function(im){
+  function fail(){
+    if(im.dataset.orig&&im.dataset.tried!=='1'){ im.dataset.tried='1'; im.src=im.dataset.orig; return; }
+    var d=document.createElement('div');
+    d.className='ph'+((im.closest('.spot')||{}).classList && im.closest('.spot').classList.contains('wide')?' tall':'');
+    var ico=im.closest('.naxos-zone')?'🏖️':'🏛️';
+    d.innerHTML='<div class="ph-ico">'+ico+'</div><div class="ph-t">'+(im.alt||'Grécia')+'</div>';
+    im.replaceWith(d);
+  }
+  im.addEventListener('error',fail);
+  if(im.complete&&im.naturalWidth===0){ fail(); }
+});
+</script>
+<script>
+(function(){
+  var t = new Date('2026-07-31T23:30:00+01:00').getTime();
+  function tick(){
+    var d = t - Date.now(); if(d<0){d=0}
+    document.getElementById('cd').textContent = Math.floor(d/864e5);
+    document.getElementById('ch').textContent = Math.floor(d%864e5/36e5);
+    document.getElementById('cm').textContent = Math.floor(d%36e5/6e4);
+  }
+  tick(); setInterval(tick,30000);
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+var MAPS = {
+  'map-chegada': { points: [
+    {lat:37.9364, lng:23.9445, name:'✈️ Aeroporto de Atenas', cat:'transport'},
+    {lat:37.9757, lng:23.7256, name:'🚇 Monastiraki (Metro M3)', cat:'transport'},
+    {lat:37.9775, lng:23.7230, name:'🏨 Aionion Residences', cat:'hotel'}
+  ]},
+  'map-dia1': { points: [
+    {lat:37.9715, lng:23.7267, name:'Acrópole de Atenas', cat:'poi'},
+    {lat:37.9684, lng:23.7287, name:'Museu da Acrópole', cat:'poi'},
+    {lat:37.9755, lng:23.7224, name:'Ágora Antiga', cat:'poi'},
+    {lat:37.9722, lng:23.7250, name:'Areópago', cat:'poi'},
+    {lat:37.9660, lng:23.7230, name:'Guarantee / Mani Mani', cat:'food'},
+    {lat:37.9738, lng:23.7288, name:'Plaka', cat:'poi'},
+    {lat:37.9743, lng:23.7297, name:'Anafiotika', cat:'poi'},
+    {lat:37.9757, lng:23.7256, name:'Monastiraki', cat:'poi'},
+    {lat:37.9762, lng:23.7259, name:'Lukumades', cat:'food'},
+    {lat:37.9779, lng:23.7462, name:'Licabeto', cat:'poi'},
+    {lat:37.9787, lng:23.7237, name:'Oineas / Kuzina', cat:'food'},
+    {lat:37.9721, lng:23.7290, name:'Scholarchio (Plaka)', cat:'food'},
+    {lat:37.9673, lng:23.7095, name:'Aster (Petralona)', cat:'food'},
+    {lat:37.9765, lng:23.7255, name:'360 / Six D.O.G.S', cat:'food'}
+  ]},
+  'map-dia2': { points: [
+    {lat:37.9755, lng:23.7348, name:'Praça Syntagma', cat:'poi'},
+    {lat:37.9715, lng:23.7367, name:'Jardim Nacional', cat:'poi'},
+    {lat:37.9683, lng:23.7411, name:'Estádio Panatenaico', cat:'poi'},
+    {lat:37.9779, lng:23.7434, name:'Philos / To Kafeneio', cat:'food'},
+    {lat:37.9781, lng:23.7440, name:'Le Greche', cat:'food'},
+    {lat:37.8180, lng:23.7780, name:'Riviera / Vouliagmeni', cat:'poi'},
+    {lat:37.8175, lng:23.7790, name:'Jantar à beira-mar', cat:'food'},
+    {lat:37.8170, lng:23.7800, name:'Bar de praia', cat:'food'}
+  ]},
+  'map-dia3': { points: [
+    {lat:37.9757, lng:23.7256, name:'Monastiraki', cat:'transport'},
+    {lat:37.9481, lng:23.6371, name:'Porto do Pireu', cat:'transport'},
+    {lat:37.1067, lng:25.3764, name:'Porto de Náxos', cat:'transport'},
+    {lat:37.0838, lng:25.3486, name:'Klimataria Studios', cat:'hotel'},
+    {lat:37.1075, lng:25.3775, name:'Chora & Kastro', cat:'poi'},
+    {lat:37.1103, lng:25.3708, name:'Portara', cat:'poi'},
+    {lat:37.1074, lng:25.3760, name:'Metaxi Mas', cat:'food'},
+    {lat:37.1080, lng:25.3766, name:'Avaton (Kastro)', cat:'food'}
+  ]},
+  'map-dia4': { points: [
+    {lat:37.0838, lng:25.3486, name:'Klimataria Studios', cat:'hotel'},
+    {lat:37.0825, lng:25.3475, name:'Agios Prokopios', cat:'poi'},
+    {lat:37.0745, lng:25.3435, name:'Agia Anna', cat:'poi'},
+    {lat:37.0740, lng:25.3436, name:'Picasso (Agia Anna)', cat:'food'},
+    {lat:37.0650, lng:25.3400, name:'Praia de Plaka', cat:'poi'},
+    {lat:37.0648, lng:25.3398, name:'Bar de praia · pôr-do-sol', cat:'food'},
+    {lat:37.0665, lng:25.3405, name:'Paradiso Taverna (Plaka)', cat:'food'}
+  ]},
+  'map-dia5': { points: [
+    {lat:37.0838, lng:25.3486, name:'Klimataria Studios', cat:'hotel'},
+    {lat:37.1002, lng:25.4318, name:'Halki', cat:'poi'},
+    {lat:37.0522, lng:25.4747, name:'Filoti (praça do plátano)', cat:'poi'},
+    {lat:37.0917, lng:25.5350, name:'Apeiranthos', cat:'poi'},
+    {lat:37.0920, lng:25.5340, name:'Rotonda (Apeiranthos)', cat:'food'},
+    {lat:37.0728, lng:25.4736, name:'Monte Zas', cat:'poi'},
+    {lat:37.0611, lng:25.4128, name:'Templo de Deméter, Sangri', cat:'poi'},
+    {lat:37.1074, lng:25.3760, name:'Doukato (Chora)', cat:'food'},
+    {lat:37.0930, lng:25.3480, name:'Axiotissa (Kastraki)', cat:'food'}
+  ]},
+  'map-dia6': { points: [
+    {lat:37.0838, lng:25.3486, name:'Klimataria Studios', cat:'hotel'},
+    {lat:37.0219, lng:25.3541, name:'Mikri Vigla', cat:'poi'},
+    {lat:36.9903, lng:25.3894, name:'Alyko & Praia Hawaii (opc.)', cat:'poi'},
+    {lat:37.1075, lng:25.3775, name:'Chora (compras)', cat:'poi'},
+    {lat:37.1103, lng:25.3708, name:'Portara (2ª vez)', cat:'poi'},
+    {lat:37.1074, lng:25.3760, name:'Jantar de despedida', cat:'food'}
+  ]},
+  'map-dia7': { points: [
+    {lat:37.0825, lng:25.3475, name:'Último mergulho · Agios Prokopios', cat:'poi'},
+    {lat:37.1067, lng:25.3764, name:'Porto de Náxos', cat:'transport'},
+    {lat:37.9481, lng:23.6371, name:'Porto do Pireu', cat:'transport'},
+    {lat:37.9364, lng:23.9445, name:'✈️ Aeroporto de Atenas', cat:'transport'}
+  ]}
+};
+var IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints||0) > 0;
+function initDayMap(id, cfg){
+  var el = document.getElementById(id);
+  if(!el || typeof L==='undefined' || !cfg || !cfg.points.length) return;
+  var map = L.map(id, {scrollWheelZoom:false, zoomControl:!IS_TOUCH, dragging:!IS_TOUCH});
+  if(IS_TOUCH){
+    var gate = document.createElement('div');
+    gate.className = 'mapgate';
+    gate.innerHTML = '<span>☝️ Toca para interagir com o mapa</span>';
+    el.appendChild(gate);
+    gate.addEventListener('click', function(){
+      map.dragging.enable();
+      if(!map._zoomCtlAdded){ L.control.zoom().addTo(map); map._zoomCtlAdded = true; }
+      if(gate.parentNode){ gate.parentNode.removeChild(gate); }
+      map.invalidateSize();
+    });
+  }
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'© OpenStreetMap', maxZoom:19
+  }).addTo(map);
+  var colors = {poi:'#c99a2e', food:'#c96b3f', hotel:'#0e3a63', transport:'#6b7280'};
+  var latlngs = [];
+  cfg.points.forEach(function(p, i){
+    var color = colors[p.cat] || '#c99a2e';
+    var icon = L.divIcon({
+      className:'', iconSize:[24,24], iconAnchor:[12,24], popupAnchor:[0,-22],
+      html:'<div class="pin" style="background:'+color+'"><span>'+(i+1)+'</span></div>'
+    });
+    L.marker([p.lat,p.lng], {icon:icon}).addTo(map).bindPopup(p.name);
+    latlngs.push([p.lat,p.lng]);
+  });
+  if(latlngs.length>1){
+    L.polyline(latlngs, {color:'#12233d', weight:2.5, opacity:.5, dashArray:'6,7'}).addTo(map);
+  }
+  map.fitBounds(latlngs, {padding:[26,26]});
+}
+document.addEventListener('DOMContentLoaded', function(){
+  Object.keys(MAPS).forEach(function(id){ initDayMap(id, MAPS[id]); });
+});
+</script>
+</body>
+</html>
