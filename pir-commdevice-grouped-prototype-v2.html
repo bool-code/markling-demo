@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PIR — Billing Specs, grouped by comm device (v2 — subscription split)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.5.0/dist/tabler-icons.min.css"/>
+<style>
+  :root{
+    --bg:#05080e; --panel:#0a0e16; --line:#243044;
+    --line2:#2f3c52; --field:#0e1626; --text:#e8ecf2; --dim:#9aa3b1; --dim2:#6f7787;
+    --blue:#4589ff; --req:#ff7eb6; --sel:#101b2e; --bad:#f85149; --ok:#3fb950;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  button{font-family:inherit;cursor:pointer;}
+  h3,h4{margin:0;}
+
+  .app{min-height:100vh;display:flex;flex-direction:column;}
+
+  .appbar{display:flex;align-items:center;justify-content:space-between;
+    padding:13px 22px;border-bottom:1px solid var(--line);background:#080c14;flex:none;}
+  .appbar .brand{font-size:13px;letter-spacing:.09em;font-weight:600;color:#cfd6e0;}
+  .appbar .right{display:flex;align-items:center;gap:14px;}
+  .appbar .env{font-size:10px;font-weight:700;letter-spacing:.1em;color:#e5b567;
+    background:rgba(229,181,103,.1);border:1px solid rgba(229,181,103,.35);
+    border-radius:4px;padding:3px 8px;}
+  .appbar .ver{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--blue);
+    background:rgba(69,137,255,.1);border:1px solid rgba(69,137,255,.4);
+    border-radius:4px;padding:3px 8px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:#16233a;border:1px solid var(--line2);
+    display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--dim);}
+
+  .apphead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 6px;flex:none;}
+  .apphead h3{font-size:21px;font-weight:600;}
+  .top-actions{display:flex;gap:10px;}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid #3a4759;
+    border-radius:7px;padding:8px 17px;font-size:13px;font-weight:500;}
+  .btn-primary{background:var(--blue);color:#06131f;border:none;border-radius:7px;
+    padding:8px 18px;font-size:13px;font-weight:600;}
+
+  .tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--line);
+    overflow-x:auto;flex:none;scrollbar-width:thin;}
+  .tab{padding:13px 15px;font-size:13px;color:var(--dim);background:none;border:none;
+    border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
+
+  .md{flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0;}
+  .master{border-right:1px solid var(--line);background:var(--panel);
+    display:flex;flex-direction:column;min-height:0;}
+  .master-head{padding:13px 15px;border-bottom:1px solid var(--line);flex:none;}
+  .master-head .ttl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--dim2);font-weight:700;}
+  .master-list{flex:1;overflow-y:auto;min-height:0;padding-bottom:6px;}
+  .master-foot{padding:12px 14px;border-top:1px solid var(--line);flex:none;}
+
+  .bt{font-size:10.5px;color:var(--dim2);font-weight:600;background:#111a28;
+    border:1px solid var(--line);border-radius:4px;padding:2px 6px;flex:none;}
+  .del{background:none;border:none;color:#4d5666;font-size:15px;padding:3px 4px;flex:none;
+    border-radius:5px;line-height:1;}
+  .del:hover{color:var(--bad);background:rgba(248,81,73,.1);}
+
+  .ghead{display:flex;align-items:center;gap:9px;padding:11px 13px;background:#0c1320;
+    border-top:1px solid var(--line);border-bottom:1px solid #18202e;}
+  .ghead i.dv{font-size:16px;color:var(--dim2);}
+  .ghead .nm{flex:1;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ghead-link{cursor:pointer;}
+  .ghead-link:hover{background:#111a2a;}
+  .ghead-link:hover .nm{color:var(--blue);}
+  .ghead .go{font-size:14px;color:#3a4759;flex:none;}
+  .ghead-link:hover .go{color:var(--blue);}
+
+  /* second-level group header: a comm ID inside a comm device */
+  .ghead.sub{padding-left:29px;background:#0a111c;border-top:1px solid #16202f;}
+  .ghead.sub i.dv{font-size:14px;color:#4a5568;}
+  .ghead.sub .nm{font-size:10.5px;letter-spacing:.07em;color:var(--dim2);}
+
+  .gitem{display:flex;align-items:center;gap:9px;padding:12px 13px 12px 33px;width:100%;
+    background:none;border:none;border-left:2px solid transparent;border-bottom:1px solid #18202e;
+    text-align:left;color:var(--dim);cursor:pointer;}
+  .gitem .nm{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gitem.sel{background:var(--sel);border-left-color:var(--blue);color:var(--text);font-weight:600;}
+  .gitem:hover{background:#0d1523;color:var(--text);}
+  .gitem.flat{padding-left:13px;}
+  .gitem.deep{padding-left:49px;}
+  .gitem.none{color:#465060;font-style:italic;cursor:default;}
+  .gitem.none:hover{background:none;color:#465060;}
+  .addrow{padding:11px 13px 13px 33px;}
+  .addrow.deep{padding-left:49px;}
+  .hintrow{padding:10px 13px 13px 49px;font-size:12px;color:#4d5666;font-style:italic;}
+  .add-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    background:transparent;color:var(--blue);border:1px dashed #2f4f86;border-radius:7px;
+    padding:9px 12px;font-size:13px;font-weight:500;width:100%;}
+  .add-btn:hover{background:rgba(69,137,255,.06);}
+  .add-btn i{font-size:15px;}
+  .empty-list{padding:20px 15px;color:#465060;font-style:italic;font-size:13px;}
+
+  .detail{overflow-y:auto;min-height:0;padding:22px 26px 30px;}
+  .crumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim2);
+    margin-bottom:14px;flex-wrap:wrap;}
+  .crumb i{font-size:13px;}
+  .crumb .cur{color:var(--text);font-weight:600;}
+  .crumb .lnk{background:none;border:none;color:var(--dim2);font-size:12px;padding:0;}
+  .crumb .lnk:hover{color:var(--blue);text-decoration:underline;}
+  .detail h4{font-size:17px;font-weight:650;margin-bottom:3px;}
+  .detail .dsub{font-size:12.5px;color:var(--dim);margin-bottom:20px;}
+  .blocklabel{font-size:14px;font-weight:650;color:var(--text);margin:20px 0 16px;
+    padding-bottom:11px;border-bottom:1px solid var(--line);max-width:900px;}
+  .blocklabel:first-child{margin-top:0;}
+  .detail-actions{display:flex;justify-content:flex-end;margin-top:24px;}
+  .btn-del{background:transparent;color:#c2606a;border:1px solid #4a2830;border-radius:7px;
+    padding:8px 15px;font-size:13px;font-weight:500;display:inline-flex;gap:7px;align-items:center;}
+  .btn-del:hover{background:rgba(248,81,73,.08);color:#e8747f;}
+
+  .inherit{border:1px solid #24405f;background:rgba(69,137,255,.05);border-radius:9px;
+    padding:14px 16px;margin-bottom:22px;max-width:900px;}
+  .inherit .ih{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:13px;}
+  .inherit .ih i{font-size:14px;}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px 24px;max-width:900px;}
+  .field{display:flex;flex-direction:column;gap:7px;}
+  label{font-size:12px;color:var(--dim);}
+  label .req{color:var(--req);margin-left:3px;}
+  input{width:100%;background:var(--field);border:1px solid var(--line2);
+    border-radius:6px;color:var(--text);font-size:13px;padding:10px 12px;}
+  input:focus{outline:none;border-color:var(--blue);}
+  input.ro{background:#0b1220;border-style:dashed;border-color:#2a3d57;color:#8f9cb0;}
+  .segwrap{display:inline-flex;background:#101a2b;border:1px solid var(--line2);border-radius:7px;
+    padding:2px;gap:2px;align-self:flex-start;flex-wrap:wrap;}
+  .seg{background:transparent;border:none;border-radius:5px;color:var(--blue);
+    font-size:12.5px;font-weight:500;padding:7px 15px;}
+  .seg:hover{background:rgba(69,137,255,.1);}
+  .seg.on{background:#1b2942;color:var(--text);font-weight:600;
+    box-shadow:inset 0 0 0 1px #33507f;}
+  .newtag{font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--ok);
+    background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.4);border-radius:4px;
+    padding:2px 5px;margin-left:6px;vertical-align:1px;}
+  .placeholder{border:1px dashed #3a4759;border-radius:9px;padding:18px;color:var(--dim2);
+    font-size:13px;max-width:900px;}
+  .empty-detail{display:grid;place-items:center;height:100%;color:#465060;font-size:13.5px;
+    text-align:center;line-height:1.8;}
+
+  /* billing rules checkbox panel */
+  .rules{max-width:900px;}
+  .rulegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4px 28px;}
+  .chk{display:flex;align-items:flex-start;gap:11px;background:none;border:none;
+    padding:12px 8px;text-align:left;border-radius:7px;width:100%;}
+  .chk:hover{background:#0c1421;}
+  .chk .box{width:18px;height:18px;border-radius:4px;border:1px solid var(--line2);
+    display:grid;place-items:center;flex:none;margin-top:1px;background:#0e1626;}
+  .chk.on .box{background:transparent;border-color:transparent;}
+  .chk .box b{font-size:14px;line-height:1;color:var(--text);display:none;font-weight:700;}
+  .chk.on .box b{display:block;}
+  .chk .txt{font-size:13.5px;color:var(--text);}
+  .chk .tip{display:block;font-size:11.5px;color:var(--dim2);margin-top:3px;}
+  .chk.off .txt{color:var(--dim);}
+
+  .note{border:1px solid #3a3050;background:rgba(160,120,255,.06);border-radius:9px;
+    padding:13px 16px;margin-bottom:20px;max-width:900px;font-size:12.5px;color:#b9aed4;line-height:1.7;}
+  .note b{color:#dcd3f0;font-weight:600;}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(2,4,8,.72);display:none;place-items:center;z-index:50;padding:20px;}
+  .scrim.show{display:grid;}
+  .modal{background:#0b1119;border:1px solid var(--line2);border-radius:12px;max-width:500px;
+    width:100%;padding:22px 24px;}
+  .modal h4{font-size:16px;font-weight:650;margin-bottom:10px;display:flex;gap:9px;align-items:center;}
+  .modal h4 i{color:#d29922;font-size:19px;}
+  .modal p{font-size:13px;color:var(--dim);line-height:1.7;margin:0 0 8px;}
+  .modal p b{color:var(--text);font-weight:600;}
+  .modal ul{margin:6px 0 0;padding-left:20px;font-size:13px;color:var(--dim);line-height:1.7;}
+  .modal .macts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .btn-danger{background:#8c2b31;color:#fff;border:none;border-radius:7px;padding:8px 17px;
+    font-size:13px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="appbar">
+    <span class="brand">PRODUCT INVOICING RULES</span>
+    <div class="right">
+      <span class="ver">V2 · SUBSCRIPTION SPLIT</span>
+      <span class="env">TEST</span>
+      <div class="avatar">CI</div>
+    </div>
+  </div>
+
+  <div class="apphead">
+    <h3>Edit Product</h3>
+    <div class="top-actions">
+      <button class="btn-ghost">Cancel</button>
+      <button class="btn-ghost">Save</button>
+      <button class="btn-primary">Submit billing packages</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="md">
+    <div class="master">
+      <div class="master-head"><span class="ttl" id="mCount"></span></div>
+      <div class="master-list" id="list"></div>
+      <div class="master-foot" id="foot" style="display:none;"></div>
+    </div>
+    <div class="detail" id="detail"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h4><i class="ti ti-alert-triangle"></i> <span id="mTitle">Delete</span></h4>
+    <div id="mBody"></div>
+    <div class="macts">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-danger" id="mConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   V2 changes vs the original grouped prototype (Irene, 14/08/2026):
+   1. One comm device + one comm ID are pre-populated and already related.
+   2. Relationship splits by level:
+        - main subscription     -> linked to the COMM DEVICE
+        - optional subscription -> linked to the COMM ID (nested one level deeper)
+   3. Optional subscription entries inherit Comm ID + Device ID + Base Technology.
+   4. 'Has Subscription' on Billing rules is split into
+      'Has main Subscription' and 'Has optional Subscription' (tooltip: e.g. HW Lease).
+   All other tabs remain linked to the comm device, as confirmed by Irene.
+   ------------------------------------------------------------------ */
+
+var TYPES = [
+  {key:'commId',      label:'Comm ID',                tab:'Comm ID'},
+  {key:'oneTime',     label:'One-time charge',        tab:'One-time charge'},
+  {key:'recurring',   label:'Recurring charge',       tab:'Recurring charge'},
+  {key:'scap',        label:'SCAP',                   tab:'SCAP'},
+  {key:'relationship',label:'Relationship',           tab:'Relationship'},
+  {key:'otFree',      label:'One-time free minutes',  tab:'One-time free minutes'},
+  {key:'recFree',     label:'Recurring free minutes', tab:'Recurring free minutes'}
+];
+
+var PRETABS = [
+  {key:'billingRules',   label:'Billing rules'},
+  {key:'packageOptions', label:'Package options'},
+  {key:'commDevice',     label:'Comm device'}
+];
+
+/* entry kinds actually stored on the model. 'relationship' is a tab, not a kind:
+   it holds relMain (on the device) and relOpt (on a comm ID). */
+var DEVICE_KINDS = ['commId','oneTime','recurring','scap','relMain','otFree','recFree'];
+
+var KIND_LABEL = {
+  commId:'Comm ID', oneTime:'One-time charge', recurring:'Recurring charge',
+  scap:'SCAP', relMain:'Main subscription', relOpt:'Optional subscription',
+  otFree:'One-time free minutes', recFree:'Recurring free minutes'
+};
+
+/* which Billing rules checkbox drives which tab (unlisted tabs always show) */
+var TAB_RULE = {oneTime:'oneTime', recurring:'recurring', otFree:'otFree', recFree:'recFree'};
+
+var RULES = [
+  {k:'oneTime',   l:'Has One-time Charge'},
+  {k:'recurring', l:'Has Recurring Charge'},
+  {k:'otFree',    l:'Has One-time Allowance / Free minutes'},
+  {k:'recFree',   l:'Has Recurring Allowance / Free minutes'},
+  {k:'pooling',   l:'Pooling is possible'},
+  {k:'mainSub',   l:'Has main Subscription', isNew:true, tip:'Linked to the comm device'},
+  {k:'optSub',    l:'Has optional Subscription', isNew:true, tip:'Linked to the comm ID — e.g. HW Lease'}
+];
+
+/* actions: the block label lists every action the single merged form covers.
+   inherit: which parent fields are shown read-only
+   ('both' | 'device' | 'chain' | 'none'). */
+var RELATIONSHIP_FIELDS = [
+  {k:'ratePlan', l:'Rate Plan'},
+  {k:'subscriptionPlan', l:'Subscription Plan'},
+  {k:'discountPlan', l:'Discount Plan'},
+  {k:'oneTimeChargeId', l:'One Time Charge ID'},
+  {k:'scapId', l:'Scap ID'}
+];
+
+var FIELDS = {
+  commId:{actions:'Activation / Termination', inherit:'both', f:[
+    {k:'commIdVal', l:'COMM ID', req:true, isNew:true},
+    {k:'commIdSvc', l:'COMM ID SERVICE', req:true, isNew:true}]},
+
+  oneTime:{actions:'Activation', inherit:'both', f:[
+    {k:'chargeId', l:'Charge ID', req:true}, {k:'ratedService', l:'Rated Service', req:true},
+    {k:'chargeName', l:'Charge Name', req:true}, {k:'glCode', l:'GL Product Code', req:true},
+    {k:'duration', l:'Duration', req:true}, {k:'userRef', l:'User Reference'}]},
+
+  recurring:{actions:'Activation / Termination', inherit:'both', f:[
+    {k:'chargeId', l:'Charge ID', req:true}, {k:'ratedService', l:'Rated Service', req:true},
+    {k:'chargeName', l:'Charge Name', req:true}, {k:'glCode', l:'GL Product Code', req:true},
+    {k:'recurringPeriod', l:'Recurring Period', t:['Invoice','Monthly','Quarterly','Annual','Bi-annual']},
+    {k:'advanceArrears', l:'Advance Arrears', t:['Advance','Arrears']},
+    {k:'duration', l:'Duration', req:true}, {k:'userRef', l:'User Reference'},
+    {k:'prorate', l:'Prorate Month 1', t:['Yes','No']}]},
+
+  scap:{actions:'Activation / Termination', inherit:'device', f:[
+    {k:'scapId', l:'Scap ID', req:true}, {k:'scapName', l:'Scap Name', req:true},
+    {k:'bundleId', l:'Bundle ID', req:true}]},
+
+  relMain:{actions:'Activation / Termination / Upgrade / Downgrade', inherit:'both',
+    f:RELATIONSHIP_FIELDS},
+
+  relOpt:{actions:'Activation / Termination / Upgrade / Downgrade', inherit:'chain',
+    f:RELATIONSHIP_FIELDS},
+
+  otFree:{actions:'Activation', inherit:'both', f:[
+    {k:'terminalPool', l:'Terminal / Pool', req:true, t:['Terminal','Pool']},
+    {k:'planId', l:'Free Mins Plan ID', req:true},
+    {k:'planName', l:'Free Mins Plan Name', req:true},
+    {k:'itemId', l:'Free Mins Item ID', req:true},
+    {k:'itemName', l:'Free Mins Item Name', req:true},
+    {k:'award', l:'Award', req:true},
+    {k:'revenueDuration', l:'Revenue / Duration', req:true, t:['Revenue','Duration']},
+    {k:'byService', l:'By Service', req:true, t:['Yes','No']},
+    {k:'discountGroup', l:'Discount Group', req:true},
+    {k:'rollover', l:'Rollover', req:true, t:['Yes','No']},
+    {k:'applyPerDevice', l:'Apply Per Comm Device', req:true, t:['Yes','No']}]},
+
+  recFree:{actions:'Activation / Termination', inherit:'both', f:[
+    {k:'terminalPool', l:'Terminal / Pool', req:true, t:['Terminal','Pool']},
+    {k:'planId', l:'Free Mins Plan ID', req:true},
+    {k:'planName', l:'Free Mins Plan Name', req:true},
+    {k:'itemId', l:'Free Mins Item ID', req:true},
+    {k:'itemName', l:'Free Mins Item Name', req:true},
+    {k:'award', l:'Award', req:true},
+    {k:'revenueDuration', l:'Revenue / Duration', req:true, t:['Revenue','Duration']},
+    {k:'discountGroup', l:'Discount Group', req:true},
+    {k:'rollover', l:'Rollover', req:true, t:['Yes','No']},
+    {k:'applyPerDevice', l:'Apply Per Comm Device', req:true, t:['Yes','No']},
+    {k:'scapId', l:'Scap ID'}]}
+};
+
+function blankEntries(){
+  var o = {};
+  DEVICE_KINDS.forEach(function(k){ o[k] = []; });
+  return o;
+}
+
+function newEntry(kind, n){
+  var e = {id:nextUid(), n:n};
+  (FIELDS[kind].f || []).forEach(function(f){ e[f.k] = ''; });
+  if (kind === 'commId') e.relOpt = [];   /* optional subscriptions live on the comm ID */
+  return e;
+}
+
+var S;
+
+function SEED(){
+  S = {
+    devices: [],
+    tab:'commDevice',
+    sel:{dev:null, cid:null, kind:null, entry:null},
+    seq:{device:0, commId:0, oneTime:0, recurring:0, scap:0, relMain:0, relOpt:0, otFree:0, recFree:0},
+    rules:{oneTime:true, recurring:true, otFree:true, recFree:true,
+           pooling:true, mainSub:true, optSub:true},
+    uid:100
+  };
+
+  /* pre-populated structure: one comm device + one comm ID, already related */
+  S.seq.device = 1;
+  var d = {id:nextUid(), bt:'', deviceId:'', standard:'', n:1, entries:blankEntries()};
+  S.seq.commId = 1;
+  d.entries.commId.push(newEntry('commId', 1));
+  S.devices.push(d);
+  S.sel = {dev:d.id, cid:null, kind:null, entry:null};
+}
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function typeOf(k){ for (var i=0;i<TYPES.length;i++) if (TYPES[i].key===k) return TYPES[i]; return null; }
+function isPre(k){ for (var i=0;i<PRETABS.length;i++) if (PRETABS[i].key===k) return PRETABS[i]; return null; }
+function dev(id){ for (var i=0;i<S.devices.length;i++) if (S.devices[i].id===id) return S.devices[i]; return null; }
+function devName(d){ return (d.bt ? d.bt : '—') + ' comm device ' + d.n; }
+function nextUid(){ return 'u' + (++S.uid); }
+
+/* entry name = base technology of the parent device + entry type + number.
+   SCAP keeps its own rule: scap name + SCAP + number. */
+function entryName(kind, e, d){
+  if (kind === 'scap') return (e.scapName ? e.scapName + ' ' : '') + 'SCAP ' + e.n;
+  var prefix = (d && d.bt) ? d.bt + ' ' : '';
+  return prefix + KIND_LABEL[kind] + ' ' + e.n;
+}
+
+function commId(d, cid){
+  for (var i=0;i<d.entries.commId.length;i++) if (d.entries.commId[i].id===cid) return d.entries.commId[i];
+  return null;
+}
+
+/* resolve any entry: optional subscriptions sit inside a comm ID */
+function findEntry(devId, cid, kind, id){
+  var d = dev(devId); if (!d) return null;
+  if (kind === 'relOpt'){
+    var c = commId(d, cid); if (!c) return null;
+    for (var i=0;i<c.relOpt.length;i++) if (c.relOpt[i].id===id) return c.relOpt[i];
+    return null;
+  }
+  var a = d.entries[kind] || [];
+  for (var j=0;j<a.length;j++) if (a[j].id===id) return a[j];
+  return null;
+}
+
+function optCount(d){
+  var t = 0;
+  d.entries.commId.forEach(function(c){ t += c.relOpt.length; });
+  return t;
+}
+function childCount(d){
+  var t = optCount(d);
+  DEVICE_KINDS.forEach(function(k){ t += d.entries[k].length; });
+  return t;
+}
+
+/* ---------------- mutations ---------------- */
+
+function addDevice(){
+  S.seq.device++;
+  var d = {id:nextUid(), bt:'', deviceId:'', standard:'', n:S.seq.device, entries:blankEntries()};
+  S.devices.push(d);
+  S.tab = 'commDevice';
+  S.sel = {dev:d.id, cid:null, kind:null, entry:null};
+  render();
+}
+
+function addEntry(devId, kind){
+  var d = dev(devId); if (!d) return;
+  S.seq[kind]++;
+  var e = newEntry(kind, S.seq[kind]);
+  d.entries[kind].push(e);
+  S.tab = (kind === 'relMain') ? 'relationship' : kind;
+  S.sel = {dev:devId, cid:null, kind:kind, entry:e.id};
+  render();
+}
+
+function addOptional(devId, cid){
+  var d = dev(devId); if (!d) return;
+  var c = commId(d, cid); if (!c) return;
+  S.seq.relOpt++;
+  var e = newEntry('relOpt', S.seq.relOpt);
+  c.relOpt.push(e);
+  S.tab = 'relationship';
+  S.sel = {dev:devId, cid:cid, kind:'relOpt', entry:e.id};
+  render();
+}
+
+function removeEntry(devId, cid, kind, id){
+  var d = dev(devId); if (!d) return;
+  if (kind === 'relOpt'){
+    var c = commId(d, cid); if (!c) return;
+    c.relOpt = c.relOpt.filter(function(e){ return e.id !== id; });
+  } else {
+    d.entries[kind] = d.entries[kind].filter(function(e){ return e.id !== id; });
+  }
+  if (S.sel.dev === devId && S.sel.kind === kind && S.sel.entry === id)
+    S.sel = {dev:null, cid:null, kind:null, entry:null};
+  render();
+}
+
+function removeDevice(id){
+  S.devices = S.devices.filter(function(d){ return d.id !== id; });
+  if (S.sel.dev === id) S.sel = {dev:null, cid:null, kind:null, entry:null};
+  render();
+}
+
+function setField(devId, cid, kind, id, fieldKey, value){
+  var d = dev(devId); if (!d) return;
+  if (kind === null) { d[fieldKey] = value; }
+  else { var e = findEntry(devId, cid, kind, id); if (e) e[fieldKey] = value; }
+  var sig = devId + '|' + cid + '|' + kind + '|' + id + '|' + fieldKey;
+  var pos = null;
+  try { pos = document.activeElement.selectionStart; } catch (err) {}
+  render();
+  var back = document.querySelector('[data-sig="' + sig + '"]');
+  if (back) { back.focus(); if (pos !== null) { try { back.setSelectionRange(pos, pos); } catch (err) {} } }
+}
+
+function toggleRule(k){
+  S.rules[k] = !S.rules[k];
+  if (!tabVisible(S.tab)) { S.tab = 'billingRules'; }
+  render();
+}
+
+/* ---------------- navigation ---------------- */
+
+function tabVisible(k){
+  if (k === 'relationship') return S.rules.mainSub || S.rules.optSub;
+  var r = TAB_RULE[k];
+  return r ? !!S.rules[r] : true;
+}
+
+function firstEntryOnTab(k){
+  var found = null;
+  if (k === 'relationship'){
+    S.devices.forEach(function(d){
+      if (!found && S.rules.mainSub && d.entries.relMain.length)
+        found = {dev:d.id, cid:null, kind:'relMain', entry:d.entries.relMain[0].id};
+      if (!found && S.rules.optSub) d.entries.commId.forEach(function(c){
+        if (!found && c.relOpt.length) found = {dev:d.id, cid:c.id, kind:'relOpt', entry:c.relOpt[0].id};
+      });
+    });
+    return found;
+  }
+  S.devices.forEach(function(d){
+    if (!found && d.entries[k].length) found = {dev:d.id, cid:null, kind:k, entry:d.entries[k][0].id};
+  });
+  return found;
+}
+
+function setTab(k){
+  S.tab = k;
+  if (k === 'commDevice'){
+    if (!dev(S.sel.dev)) S.sel = {dev:S.devices.length ? S.devices[0].id : null, cid:null, kind:null, entry:null};
+    else S.sel = {dev:S.sel.dev, cid:null, kind:null, entry:null};
+  } else if (!isPre(k)) {
+    S.sel = firstEntryOnTab(k) || {dev:null, cid:null, kind:null, entry:null};
+  }
+  render();
+}
+function selEntry(devId, cid, kind, id){ S.sel = {dev:devId, cid:cid, kind:kind, entry:id}; render(); }
+function selDevice(devId){ S.sel = {dev:devId, cid:null, kind:null, entry:null}; render(); }
+function goToDevice(devId){ S.tab = 'commDevice'; S.sel = {dev:devId, cid:null, kind:null, entry:null}; render(); }
+function goToCommId(devId, cid){ S.tab = 'commId'; S.sel = {dev:devId, cid:null, kind:'commId', entry:cid}; render(); }
+
+/* ---------------- modal ---------------- */
+
+var pending = null;
+function openModal(title, html, onOk){
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = html;
+  document.getElementById('scrim').classList.add('show');
+  pending = onOk;
+}
+function closeModal(){ document.getElementById('scrim').classList.remove('show'); pending = null; }
+document.getElementById('mConfirm').addEventListener('click', function(){
+  var fn = pending; closeModal(); if (fn) fn();
+});
+document.getElementById('scrim').addEventListener('click', function(ev){
+  if (ev.target === this) closeModal();
+});
+
+function confirmDeleteDevice(id){
+  var d = dev(id); if (!d) return;
+  if (childCount(d) === 0) { removeDevice(id); return; }
+  var lines = DEVICE_KINDS.filter(function(k){ return d.entries[k].length; })
+    .map(function(k){ return '<li>' + d.entries[k].length + ' × ' + esc(KIND_LABEL[k]) + '</li>'; }).join('');
+  if (optCount(d)) lines += '<li>' + optCount(d) + ' × ' + esc(KIND_LABEL.relOpt)
+    + ' <span style="color:#6f7787">(under its comm IDs)</span></li>';
+  openModal('Delete ' + devName(d) + '?',
+    '<p>The following are grouped under this device and will be deleted with it:</p><ul>' + lines + '</ul>',
+    function(){ removeDevice(id); });
+}
+
+function confirmDeleteEntry(devId, cid, kind, id){
+  var d = dev(devId); if (!d) return;
+  var e = findEntry(devId, cid, kind, id); if (!e) return;
+
+  if (kind === 'commId' && e.relOpt.length){
+    openModal('Delete ' + entryName(kind, e, d) + '?',
+      '<p>This comm ID has <b>' + e.relOpt.length + ' optional subscription'
+      + (e.relOpt.length===1?'':'s') + '</b> linked to it. They will be deleted with it.</p>',
+      function(){ removeEntry(devId, cid, kind, id); });
+    return;
+  }
+
+  var where = (kind === 'relOpt')
+    ? '<b>' + esc(entryName('commId', commId(d, cid), d)) + '</b> on ' + esc(devName(d))
+    : '<b>' + esc(devName(d)) + '</b>';
+  openModal('Delete ' + entryName(kind, e, d) + '?',
+    '<p>This removes it from ' + where + '.</p>',
+    function(){ removeEntry(devId, cid, kind, id); });
+}
+
+/* ---------------- render: tabs ---------------- */
+
+function renderTabs(){
+  var html = PRETABS.map(function(P){
+    return '<button class="tab' + (S.tab===P.key?' active':'') + '" onclick="setTab(\'' + P.key + '\')">' + esc(P.label) + '</button>';
+  }).join('');
+  html += TYPES.filter(function(T){ return tabVisible(T.key); }).map(function(T){
+    return '<button class="tab' + (S.tab===T.key?' active':'') + '" onclick="setTab(\'' + T.key + '\')">' + esc(T.tab) + '</button>';
+  }).join('');
+  document.getElementById('tabs').innerHTML = html;
+}
+
+/* ---------------- render: master list ---------------- */
+
+function rowHtml(d, cid, kind, e, deep){
+  var on = (S.sel.dev===d.id && S.sel.kind===kind && S.sel.entry===e.id);
+  var cidArg = cid ? ("'" + cid + "'") : 'null';
+  return '<div class="gitem' + (deep?' deep':'') + (on?' sel':'') + '" onclick="selEntry(\'' + d.id + '\',' + cidArg + ',\'' + kind + '\',\'' + e.id + '\')">'
+    + '<span class="nm">' + esc(entryName(kind, e, d)) + '</span>'
+    + '<button class="del" title="Remove" onclick="event.stopPropagation();confirmDeleteEntry(\'' + d.id + '\',' + cidArg + ',\'' + kind + '\',\'' + e.id + '\')"><i class="ti ti-trash"></i></button>'
+    + '</div>';
+}
+
+function deviceHeadHtml(d){
+  return '<div class="ghead ghead-link" title="Open this comm device" onclick="goToDevice(\'' + d.id + '\')">'
+    + '<i class="ti ti-router dv"></i><span class="nm">' + esc(devName(d)) + '</span>'
+    + '<i class="ti ti-external-link go"></i></div>';
+}
+
+function relationshipList(){
+  return S.devices.map(function(d){
+    var html = deviceHeadHtml(d);
+
+    if (S.rules.mainSub){
+      html += d.entries.relMain.length
+        ? d.entries.relMain.map(function(e){ return rowHtml(d, null, 'relMain', e, false); }).join('')
+        : '<div class="gitem none"><span class="nm">No main subscription on this device</span></div>';
+      html += '<div class="addrow"><button class="add-btn" onclick="addEntry(\'' + d.id + '\',\'relMain\')">'
+        + '<i class="ti ti-plus"></i> Add main subscription to this device</button></div>';
+    }
+
+    if (S.rules.optSub){
+      if (!d.entries.commId.length){
+        html += '<div class="hintrow">Add a comm ID to this device to configure optional subscriptions.</div>';
+      } else {
+        d.entries.commId.forEach(function(c){
+          html += '<div class="ghead sub ghead-link" title="Open this comm ID" onclick="goToCommId(\'' + d.id + '\',\'' + c.id + '\')">'
+            + '<i class="ti ti-id dv"></i><span class="nm">' + esc(entryName('commId', c, d)) + '</span>'
+            + '<i class="ti ti-external-link go"></i></div>';
+          html += c.relOpt.length
+            ? c.relOpt.map(function(e){ return rowHtml(d, c.id, 'relOpt', e, true); }).join('')
+            : '<div class="gitem none deep"><span class="nm">No optional subscription on this comm ID</span></div>';
+          html += '<div class="addrow deep"><button class="add-btn" onclick="addOptional(\'' + d.id + '\',\'' + c.id + '\')">'
+            + '<i class="ti ti-plus"></i> Add optional subscription to this comm ID</button></div>';
+        });
+      }
+    }
+    return html;
+  }).join('');
+}
+
+function renderList(){
+  var host = document.getElementById('list');
+  var foot = document.getElementById('foot');
+  var head = document.getElementById('mCount');
+  var key = S.tab;
+  var pre = isPre(key);
+
+  if (key === 'billingRules'){
+    foot.style.display = 'none';
+    host.innerHTML = '<div class="empty-list">Product details — the checkboxes on the right drive which tabs appear.</div>';
+    head.textContent = 'Billing rules';
+    return;
+  }
+
+  if (pre && key !== 'commDevice'){
+    foot.style.display = 'none';
+    host.innerHTML = '<div class="empty-list">' + esc(pre.label) + ' — not built in this prototype.</div>';
+    head.textContent = pre.label;
+    return;
+  }
+
+  if (key === 'commDevice'){
+    foot.style.display = '';
+    foot.innerHTML = '<button class="add-btn" onclick="addDevice()"><i class="ti ti-plus"></i> Add device</button>';
+    host.innerHTML = S.devices.length
+      ? S.devices.map(function(d){
+          var on = (S.sel.dev===d.id);
+          return '<div class="gitem flat' + (on?' sel':'') + '" onclick="selDevice(\'' + d.id + '\')">'
+            + '<i class="ti ti-router" style="font-size:16px;color:' + (on?'var(--blue)':'var(--dim2)') + ';"></i>'
+            + '<span class="nm">' + esc(devName(d)) + '</span>'
+            + '<button class="del" title="Remove device" onclick="event.stopPropagation();confirmDeleteDevice(\'' + d.id + '\')"><i class="ti ti-trash"></i></button>'
+            + '</div>';
+        }).join('')
+      : '<div class="empty-list">No comm devices yet — add one below.</div>';
+    head.textContent = S.devices.length + ' comm device' + (S.devices.length===1?'':'s');
+    return;
+  }
+
+  foot.style.display = 'none';
+
+  if (!S.devices.length){
+    host.innerHTML = '<div class="empty-list">No comm devices — add one on the Comm device tab.</div>';
+    head.textContent = (key==='relationship' ? 'Relationship' : typeOf(key).label);
+    return;
+  }
+
+  if (key === 'relationship'){
+    host.innerHTML = relationshipList();
+    head.textContent = 'Relationship · main on device, optional on comm ID';
+    return;
+  }
+
+  var T = typeOf(key);
+  host.innerHTML = S.devices.map(function(d){
+    var arr = d.entries[key];
+    var rows = arr.length
+      ? arr.map(function(e){ return rowHtml(d, null, key, e, false); }).join('')
+      : '<div class="gitem none"><span class="nm">Nothing on this device</span></div>';
+    return deviceHeadHtml(d) + rows
+      + '<div class="addrow"><button class="add-btn" onclick="addEntry(\'' + d.id + '\',\'' + key + '\')">'
+      + '<i class="ti ti-plus"></i> Add ' + esc(T.label.toLowerCase()) + ' to this device</button></div>';
+  }).join('');
+  head.textContent = T.label + ' · grouped by device';
+}
+
+/* ---------------- render: detail ---------------- */
+
+function fieldHtml(devId, cid, kind, id, f, val){
+  var cArg = cid ? ("'" + cid + "'") : 'null';
+  var kArg = kind ? ("'" + kind + "'") : 'null';
+  var iArg = id ? ("'" + id + "'") : 'null';
+  var head = '<div class="field"><label>' + esc(f.l) + (f.req?' <span class="req">*</span>':'')
+    + (f.isNew?'<span class="newtag">NEW</span>':'') + '</label>';
+
+  if (f.t){
+    var opts = f.t.map(function(o){
+      var on = (val === o);
+      return '<button class="seg' + (on?' on':'') + '" onclick="setField(\'' + devId + '\',' + cArg + ',' + kArg + ','
+        + iArg + ',\'' + f.k + '\',\'' + o + '\')">' + esc(o) + '</button>';
+    }).join('');
+    return head + '<div class="segwrap">' + opts + '</div></div>';
+  }
+
+  return head
+    + '<input data-sig="' + devId + '|' + cid + '|' + kind + '|' + id + '|' + f.k + '"'
+    + ' value="' + esc(val) + '" oninput="setField(\'' + devId + '\',' + cArg + ',' + kArg + ',' + iArg
+    + ',\'' + f.k + '\',this.value)"/>'
+    + '</div>';
+}
+
+function roField(label, value, isNew){
+  return '<div class="field"><label>' + esc(label) + (isNew?'<span class="newtag">NEW</span>':'')
+    + '</label><input class="ro" value="' + esc(value) + '" readonly/></div>';
+}
+
+function inheritBlock(d, c, mode){
+  if (mode === 'none') return '';
+  var rows = '', title = 'From the parent comm device — read only';
+
+  if (mode === 'chain'){
+    title = 'From the parent comm ID and its comm device — read only';
+    var cname = c ? (c.commIdVal || entryName('commId', c, d)) : '—';
+    rows += roField('Comm ID', cname, true);
+    rows += roField('Device ID', d.deviceId || 'Not defined yet');
+    rows += roField('Base Technology', d.bt || '—');
+  } else {
+    rows += roField('Device ID', d.deviceId || 'Not defined yet');
+    if (mode !== 'device') rows += roField('Base Technology', d.bt || '—');
+  }
+
+  return '<div class="inherit"><div class="ih"><i class="ti ti-link"></i> ' + title + '</div>'
+    + '<div class="grid2">' + rows + '</div></div>';
+}
+
+function deviceForm(d){
+  var fs = [{k:'deviceId', l:'Device ID', req:true},
+            {k:'bt', l:'Base Technology', req:true},
+            {k:'standard', l:'Device Standard', req:true}];
+  return '<div class="blocklabel">Comm device</div>'
+    + '<div class="grid2">'
+    + fs.map(function(f){ return fieldHtml(d.id, null, null, null, f, d[f.k]||''); }).join('') + '</div>';
+}
+
+function entryForm(d, cid, kind, e){
+  var spec = FIELDS[kind];
+  var c = (kind === 'relOpt') ? commId(d, cid) : null;
+  var cArg = cid ? ("'" + cid + "'") : 'null';
+
+  var bodyHtml = '<div class="grid2">'
+    + spec.f.map(function(f){ return fieldHtml(d.id, cid, kind, e.id, f, e[f.k]||''); }).join('')
+    + '</div>';
+
+  var lead = '';
+  if (kind === 'relMain') lead = '<div class="note"><b>Main subscription</b> — linked to the comm device.</div>';
+  if (kind === 'relOpt')  lead = '<div class="note"><b>Optional subscription</b> — linked to the comm ID (e.g. HW Lease), not to the comm device directly.</div>';
+
+  return '<div class="blocklabel">' + esc(spec.actions) + '</div>'
+    + lead
+    + inheritBlock(d, c, spec.inherit) + bodyHtml
+    + '<div class="detail-actions"><button class="btn-del" onclick="confirmDeleteEntry(\'' + d.id + '\',' + cArg + ',\'' + kind + '\',\'' + e.id + '\')"><i class="ti ti-trash"></i> Remove this ' + esc(KIND_LABEL[kind].toLowerCase()) + '</button></div>';
+}
+
+function rulesForm(){
+  var boxes = RULES.map(function(R){
+    var on = !!S.rules[R.k];
+    return '<button class="chk ' + (on?'on':'off') + '" onclick="toggleRule(\'' + R.k + '\')"'
+      + (R.tip ? ' title="' + esc(R.tip) + '"' : '') + '>'
+      + '<span class="box"><b>&#10003;</b></span>'
+      + '<span class="txt">' + esc(R.l) + (R.isNew?'<span class="newtag">NEW</span>':'')
+      + (R.tip ? '<span class="tip">' + esc(R.tip) + '</span>' : '')
+      + '</span></button>';
+  }).join('');
+
+  return '<div class="blocklabel">Product details</div>'
+    + '<div class="note"><b>Changed in v2:</b> the single <b>Has Subscription</b> checkbox is split into '
+    + '<b>Has main Subscription</b> and <b>Has optional Subscription</b>, because a main subscription is linked '
+    + 'to the comm device while an optional subscription (e.g. HW Lease) is linked to the comm ID. '
+    + 'Tick and untick them to see the Relationship tab change.</div>'
+    + '<div class="rules"><div style="font-size:12px;color:var(--dim);margin-bottom:6px;">Unique identifier communication lines</div>'
+    + '<div class="rulegrid">' + boxes + '</div></div>';
+}
+
+function renderDetail(){
+  var host = document.getElementById('detail');
+
+  if (S.tab === 'billingRules'){ host.innerHTML = rulesForm(); return; }
+
+  var pre = isPre(S.tab);
+  if (pre && S.tab !== 'commDevice'){
+    host.innerHTML = '<div class="empty-detail">' + esc(pre.label) + '<br/>Not built in this prototype.</div>';
+    return;
+  }
+
+  var d = dev(S.sel.dev);
+
+  if (S.tab === 'commDevice'){
+    host.innerHTML = d ? deviceForm(d)
+      : '<div class="empty-detail">Select a comm device on the left,<br/>or add one.</div>';
+    return;
+  }
+
+  var e = (d && S.sel.kind) ? findEntry(d.id, S.sel.cid, S.sel.kind, S.sel.entry) : null;
+  host.innerHTML = (d && e) ? entryForm(d, S.sel.cid, S.sel.kind, e)
+    : '<div class="empty-detail">Nothing selected.<br/>Pick one on the left, or add it to a device.</div>';
+}
+
+function render(){ renderTabs(); renderList(); renderDetail(); }
+
+SEED();
+render();
+</script>
+</body>
+</html>
